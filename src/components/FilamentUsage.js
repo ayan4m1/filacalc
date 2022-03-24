@@ -100,7 +100,11 @@ export default function FilamentUsage() {
               )
             },
             { label: 'Mass', content: <span>{mass.toFixed(2)} g</span> },
-            { label: 'Cost', content: <span>{cost.toFixed(2)}</span> }
+            { label: 'Cost', content: <span>{cost.toFixed(2)}</span> },
+            {
+              label: 'Prints per kg',
+              content: <span>{Math.floor(1e3 / mass)}</span>
+            }
           ]}
         />
       )}
