@@ -21,7 +21,7 @@ export default function ExtruderCalibration() {
 
   return (
     <Layout title="Extruder Calibration">
-      <h1>Extruder Step Calibration</h1>
+      <h1>Extruder Steps Calibration</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
           <Form.Label>Current Steps per mm</Form.Label>
