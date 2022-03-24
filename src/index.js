@@ -4,10 +4,8 @@ import 'regenerator-runtime/runtime';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import './icons.js';
-
 import './index.scss';
-import App from './components/App/App';
+import App from './components/App';
 
 ReactDOM.render(
   <Router>
