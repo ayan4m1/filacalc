@@ -1,4 +1,5 @@
 import {
+  faRulerHorizontal,
   faWeightHanging,
   faWeightScale
 } from '@fortawesome/free-solid-svg-icons';
@@ -21,6 +22,9 @@ export default function Header() {
             </Nav.Link>
             <Nav.Link as={Link} to="/spool">
               <FontAwesomeIcon icon={faWeightScale} /> Spool Usage
+            </Nav.Link>
+            <Nav.Link as={Link} to="/extruder">
+              <FontAwesomeIcon icon={faRulerHorizontal} /> Extruder Calibration
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
