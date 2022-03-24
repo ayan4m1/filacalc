@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 
 export default function Header() {
   return (
-    <Navbar bg="light" expand="lg" className="mb-4">
+    <Navbar variant="dark" bg="dark" expand="lg" className="mb-4">
       <Container>
         <Navbar.Brand as={Link} to="/">
           Filacalc
