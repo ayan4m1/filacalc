@@ -1,5 +1,6 @@
 export const spools = [
   { brand: '3D Solutech', mass: 173 },
+  { brand: 'Amazon Basics', mass: 248 },
   { brand: 'Amolen', mass: 190 },
   { brand: 'Atomic Filament', mass: 306 },
   { brand: 'Colorfabb', mass: 236 },
