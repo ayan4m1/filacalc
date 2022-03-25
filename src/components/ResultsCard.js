@@ -21,7 +21,8 @@ ResultsCard.propTypes = {
   results: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
-      content: PropTypes.oneOfType(PropTypes.node, PropTypes.string).isRequired
+      content: PropTypes.oneOfType([PropTypes.node, PropTypes.string])
+        .isRequired
     })
   ).isRequired,
   title: PropTypes.string
