@@ -12,7 +12,9 @@ export default function SpoolUsage() {
     material: null,
     diameter: 1.75,
     netWeight: 1000,
-    currentWeight: 0
+    currentWeight: 0,
+    customSpoolMass: 0,
+    customMaterialDensity: 0
   };
 
   const { values, handleChange, setFieldValue } = useFormik({ initialValues });
@@ -32,17 +34,26 @@ export default function SpoolUsage() {
     remainingLength = 0,
     showWarning = false;
 
-  if (values.brand && values.material) {
-    remainingMass = Math.max(
-      0,
-      values.currentWeight - getSpool(values.brand).mass
-    );
+  if (
+    (values.brand || values.customSpoolMass) &&
+    (values.material || values.customMaterialDensity)
+  ) {
+    const spoolMass =
+      values.brand !== 'custom'
+        ? getSpool(values.brand).mass
+        : values.customSpoolMass;
+    const materialDensity =
+      values.material !== 'custom'
+        ? getMaterial(values.material).density
+        : values.customMaterialDensity;
+
+    remainingMass = Math.max(0, values.currentWeight - spoolMass);
 
     if (remainingMass === 0) {
       showWarning = true;
     }
 
-    remainingVolume = remainingMass / getMaterial(values.material).density;
+    remainingVolume = remainingMass / materialDensity;
     remainingLength =
       remainingVolume / (Math.PI * Math.pow(values.diameter / 2.0, 2));
 
@@ -63,17 +74,25 @@ export default function SpoolUsage() {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {spools.map((spool) => (
-                <Dropdown.Item
-                  key={spool.brand}
-                  eventKey={spool.brand}
-                  value={spool.brand}
-                >
+                <Dropdown.Item key={spool.brand} eventKey={spool.brand}>
                   {spool.brand}
                 </Dropdown.Item>
               ))}
+              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>
+        {values.brand === 'custom' && (
+          <Form.Group>
+            <Form.Label>Custom Spool Mass (g)</Form.Label>
+            <Form.Control
+              type="number"
+              name="customSpoolMass"
+              value={values.customSpoolMass}
+              onChange={handleChange}
+            />
+          </Form.Group>
+        )}
         <Form.Group>
           <Form.Label>Material</Form.Label>
           <Dropdown onSelect={changeMaterial}>
@@ -90,9 +109,23 @@ export default function SpoolUsage() {
                   {material.name}
                 </Dropdown.Item>
               ))}
+              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>
+        {values.material === 'custom' && (
+          <Form.Group>
+            <Form.Label>
+              Custom Material Density (g/cm<sup>3</sup>)
+            </Form.Label>
+            <Form.Control
+              type="number"
+              name="customMaterialDensity"
+              value={values.customMaterialDensity}
+              onChange={handleChange}
+            />
+          </Form.Group>
+        )}
         <Form.Group>
           <Form.Label>Filament Diameter (mm)</Form.Label>
           <Form.Control
@@ -141,6 +174,14 @@ export default function SpoolUsage() {
             {
               label: 'Length',
               content: <span>{remainingLength.toFixed(2)} m</span>
+            },
+            {
+              label: 'Volume',
+              content: (
+                <span>
+                  {remainingVolume.toFixed(2)} cm<sup>3</sup>
+                </span>
+              )
             }
           ]}
         />
