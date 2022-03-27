@@ -11,7 +11,8 @@ export default function FilamentUsage() {
     material: null,
     diameter: 1.75,
     length: 1,
-    price: 0
+    price: 0,
+    customMaterialDensity: 0
   };
 
   const { values, handleChange, setFieldValue } = useFormik({
@@ -28,11 +29,14 @@ export default function FilamentUsage() {
     density = 0,
     cost = 0;
 
-  if (values.material) {
+  if (values.material || values.customMaterialDensity) {
     volume =
       (Math.PI * Math.pow(values.diameter / 2.0, 2) * (values.length * 1e3)) /
       1e3;
-    density = getMaterial(values.material).density;
+    density =
+      values.material !== 'custom'
+        ? getMaterial(values.material).density
+        : values.customMaterialDensity;
     mass = volume * density;
 
     if (values.price > 0) {
@@ -60,9 +64,23 @@ export default function FilamentUsage() {
                   {material.name}
                 </Dropdown.Item>
               ))}
+              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>
+        {values.material === 'custom' && (
+          <Form.Group>
+            <Form.Label>
+              Custom Material Density (g/cm<sup>3</sup>)
+            </Form.Label>
+            <Form.Control
+              type="number"
+              name="customMaterialDensity"
+              value={values.customMaterialDensity}
+              onChange={handleChange}
+            />
+          </Form.Group>
+        )}
         <Form.Group>
           <Form.Label>Diameter (mm)</Form.Label>
           <Form.Control
