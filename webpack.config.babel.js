@@ -80,6 +80,10 @@ export default {
             options: { minimize: true }
           }
         ]
+      },
+      {
+        test: /\.svg$/,
+        use: ['svg-url-loader']
       }
     ]
   },

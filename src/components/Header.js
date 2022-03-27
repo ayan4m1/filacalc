@@ -7,11 +7,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+import spoolLogo from 'images/filament-spool.svg';
+
 export default function Header() {
   return (
     <Navbar variant="dark" bg="dark" expand="lg" className="mb-4">
       <Container>
         <Navbar.Brand as={Link} to="/">
+          <img
+            src={spoolLogo}
+            width={64}
+            style={{ stroke: '#b58900' }}
+            alt="Filament Spool"
+          />{' '}
           Filacalc
         </Navbar.Brand>
         <Navbar.Toggle />
