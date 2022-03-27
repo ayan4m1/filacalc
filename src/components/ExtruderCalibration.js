@@ -26,7 +26,7 @@ export default function ExtruderCalibration() {
         <Form.Group>
           <Form.Label>Current Steps per mm</Form.Label>
           <Form.Control
-            type="text"
+            type="number"
             name="currentSteps"
             value={values.currentSteps}
             onChange={handleChange}
@@ -35,7 +35,7 @@ export default function ExtruderCalibration() {
         <Form.Group>
           <Form.Label>Length of 100mm Extrusion (mm)</Form.Label>
           <Form.Control
-            type="text"
+            type="number"
             name="extrudedLength"
             value={values.extrudedLength}
             onChange={handleChange}

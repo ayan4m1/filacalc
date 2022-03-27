@@ -129,7 +129,7 @@ export default function SpoolUsage() {
         <Form.Group>
           <Form.Label>Filament Diameter (mm)</Form.Label>
           <Form.Control
-            type="text"
+            type="number"
             name="diameter"
             onChange={handleChange}
             value={values.diameter}
@@ -138,7 +138,7 @@ export default function SpoolUsage() {
         <Form.Group>
           <Form.Label>Current Weight (g)</Form.Label>
           <Form.Control
-            type="text"
+            type="number"
             name="currentWeight"
             onChange={handleChange}
             value={values.currentWeight}
@@ -147,7 +147,7 @@ export default function SpoolUsage() {
         <Form.Group>
           <Form.Label>Net Weight (g)</Form.Label>
           <Form.Control
-            type="text"
+            type="number"
             name="netWeight"
             onChange={handleChange}
             value={values.netWeight}
