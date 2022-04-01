@@ -41,7 +41,6 @@ export default {
     compress: dev,
     open: true,
     historyApiFallback: true,
-    hot: dev,
     port: 9000
   },
   module: {
