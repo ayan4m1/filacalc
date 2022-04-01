@@ -51,56 +51,20 @@ export default function FilamentUsage() {
 
       let totalExtrusionDistance = 0;
 
-      // reader.addEventListener('progress', (e) => {
-      //   // eslint-disable-next-line
-      //   console.dir(Math.round(e.loaded / e.total));
-      //   setProgress(Math.round(e.loaded / e.total));
-      // });
-
       reader.addEventListener('load', (e) => {
         setProgress(0);
         const code = e.target.result;
         const lines = code.split(/[\n]/g);
         const movementCommands = lines.filter((line) => /^G1/.test(line));
-        // const nozzlePosition = [0, 0, 0];
 
         let index = 0;
-        // let index = 0,
-        //   lastHeight = 0,
-        //   layerHeight = 0;
-
-        // const lastPosition = [0, 0, 0];
-        // const axes = 'XYZ';
 
         for (const command of movementCommands) {
-          // lastPosition = [...nozzlePosition];
-
           for (const [, , , axis, position] of parseMove(command)) {
             if (axis === 'E') {
               totalExtrusionDistance += parseFloat(position);
             }
-            // } else if (axis === 'Z') {
-            //   const newHeight = parseFloat(position);
-
-            //   layerHeight = newHeight - lastHeight;
-            //   lastHeight = newHeight;
-            // }
-
-            // const positionIndex = axes.indexOf(axis);
-
-            // if (positionIndex === -1) {
-            //   // eslint-disable-next-line
-            //   continue;
-            // }
-
-            // nozzlePosition[positionIndex] = parseFloat(position);
           }
-
-          // const movementDistance = Math.sqrt(
-          //   Math.pow(nozzlePosition[0] - lastPosition[0], 2) +
-          //     Math.pow(nozzlePosition[1] - lastPosition[1], 2) +
-          //     Math.pow(nozzlePosition[2] - lastPosition[2], 2)
-          // );
 
           setProgress(Math.round((index / movementCommands.length) * 1e2));
           index++;
