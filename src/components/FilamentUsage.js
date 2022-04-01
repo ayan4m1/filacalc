@@ -1,23 +1,24 @@
 import { useFormik } from 'formik';
-import { Fragment, useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Col,
   Row,
   Form,
   Dropdown,
   Spinner,
-  ProgressBar
+  ProgressBar,
+  Alert,
+  Container
 } from 'react-bootstrap';
 
 import Layout from 'components/Layout';
 import ResultsCard from 'components/ResultsCard';
-import { materials, getMaterial } from 'utils';
-
-const parseMove = (line) => [
-  ...line.trim().matchAll(/(\s*(([XYZFE])([0-9\-.]+))\s*)/g)
-];
+import parserWorker from 'workers/parser';
+import { createWebWorker, materials, getMaterial } from 'utils';
 
 export default function FilamentUsage() {
+  const ParserWorker = useMemo(() => createWebWorker(parserWorker), []);
+  const [parseError, setParseError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const initialValues = {
@@ -32,55 +33,45 @@ export default function FilamentUsage() {
     initialValues
   });
 
+  const parseHandler = ({ data }) => {
+    switch (data.type) {
+      case 'progress':
+        setProgress(data.progress);
+        break;
+      case 'result':
+        setFieldValue('length', data.length.toFixed(2));
+        setLoading(false);
+        break;
+      case 'error':
+        setParseError(true);
+        setLoading(false);
+        break;
+      default:
+        break;
+    }
+  };
+
   const changeMaterial = useCallback(
     (name) => setFieldValue('material', name),
     [setFieldValue]
   );
-
   const changeFile = useCallback(
     (event) => {
+      setParseError(false);
+      setLoading(true);
+      setProgress(0);
+
       const [file] = event.target.files;
 
       if (!file || !file.name.endsWith('.gcode')) {
-        return false;
+        setParseError(true);
+        setLoading(false);
+        return;
       }
 
-      setLoading(true);
-
-      const reader = new FileReader();
-
-      let totalExtrusionDistance = 0;
-
-      reader.addEventListener('load', (e) => {
-        setProgress(0);
-        const code = e.target.result;
-        const lines = code.split(/[\n]/g);
-        const movementCommands = lines.filter((line) => /^G1/.test(line));
-
-        let index = 0;
-
-        for (const command of movementCommands) {
-          for (const [, , , axis, position] of parseMove(command)) {
-            if (axis === 'E') {
-              totalExtrusionDistance += parseFloat(position);
-            }
-          }
-
-          setProgress(Math.round((index / movementCommands.length) * 1e2));
-          index++;
-        }
-
-        setInterval(() => {
-          setLoading(false);
-          setProgress(0);
-        }, 500);
-        setFieldValue('length', (totalExtrusionDistance / 1e3).toFixed(2));
-      });
-      reader.readAsText(file);
-
-      return true;
+      ParserWorker.postMessage(file);
     },
-    [setFieldValue, setLoading]
+    [setLoading, ParserWorker]
   );
 
   let mass = 0,
@@ -103,11 +94,17 @@ export default function FilamentUsage() {
     }
   }
 
-  return (
-    <Layout title="Filament Usage">
-      <h1>Filament Usage</h1>
-      {loading ? (
-        <Fragment>
+  useEffect(() => {
+    ParserWorker.addEventListener('message', parseHandler);
+
+    return () => ParserWorker.removeEventListener('message', parseHandler);
+  });
+
+  if (loading) {
+    return (
+      <Layout title="Filament Usage">
+        <h1>Filament Usage</h1>
+        <Container>
           <Row>
             <Col className="text-center">
               <h4>Parsing your G-code...</h4>
@@ -119,93 +116,107 @@ export default function FilamentUsage() {
               <ProgressBar variant="primary" animated now={progress} />
             </Col>
           </Row>
-        </Fragment>
-      ) : (
-        <Fragment>
-          <Form>
-            <Form.Group>
-              <Form.Label>Select a G-code file</Form.Label>
-              <Form.Control type="file" onChange={changeFile}></Form.Control>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Material</Form.Label>
-              <Dropdown onSelect={changeMaterial}>
-                <Dropdown.Toggle variant="primary">
-                  {values.material ? values.material : 'Select One'}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {materials.map((material) => (
-                    <Dropdown.Item
-                      key={material.name}
-                      eventKey={material.name}
-                      value={material.name}
-                    >
-                      {material.name}
-                    </Dropdown.Item>
-                  ))}
-                  <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </Form.Group>
-            {values.material === 'custom' && (
-              <Form.Group>
-                <Form.Label>
-                  Custom Material Density (g/cm<sup>3</sup>)
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  name="customMaterialDensity"
-                  value={values.customMaterialDensity}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-            )}
-            <Form.Group>
-              <Form.Label>Diameter (mm)</Form.Label>
-              <Form.Control
-                name="diameter"
-                onChange={handleChange}
-                value={values.diameter}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Length (m)</Form.Label>
-              <Form.Control
-                name="length"
-                onChange={handleChange}
-                value={values.length}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Price (cost/kg)</Form.Label>
-              <Form.Control
-                name="price"
-                onChange={handleChange}
-                value={values.price}
-              />
-            </Form.Group>
-          </Form>
-          {Boolean(values.material) && (
-            <ResultsCard
-              results={[
-                {
-                  label: 'Volume',
-                  content: (
-                    <span>
-                      {volume.toFixed(2)} cm<sup>3</sup>
-                    </span>
-                  )
-                },
-                { label: 'Mass', content: <span>{mass.toFixed(2)} g</span> },
-                { label: 'Cost', content: <span>{cost.toFixed(2)}</span> },
-                {
-                  label: 'Prints per kg',
-                  content: <span>{Math.floor(1e3 / mass)}</span>
-                }
-              ]}
+        </Container>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout title="Filament Usage">
+      <h1>Filament Usage</h1>
+      <Form>
+        <Form.Group>
+          <Form.Label>Select a G-code file</Form.Label>
+          <Form.Control
+            type="file"
+            onChange={changeFile}
+            isInvalid={parseError}
+          ></Form.Control>
+          <Form.Control.Feedback type="invalid">
+            Unable to parse the selected file.
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Material</Form.Label>
+          <Dropdown onSelect={changeMaterial}>
+            <Dropdown.Toggle variant="primary">
+              {values.material ? values.material : 'Select One'}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {materials.map((material) => (
+                <Dropdown.Item
+                  key={material.name}
+                  eventKey={material.name}
+                  value={material.name}
+                >
+                  {material.name}
+                </Dropdown.Item>
+              ))}
+              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Form.Group>
+        {values.material === 'custom' && (
+          <Form.Group>
+            <Form.Label>
+              Custom Material Density (g/cm<sup>3</sup>)
+            </Form.Label>
+            <Form.Control
+              type="number"
+              name="customMaterialDensity"
+              value={values.customMaterialDensity}
+              onChange={handleChange}
             />
-          )}
-        </Fragment>
+          </Form.Group>
+        )}
+        <Form.Group>
+          <Form.Label>Diameter (mm)</Form.Label>
+          <Form.Control
+            name="diameter"
+            onChange={handleChange}
+            value={values.diameter}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Length (m)</Form.Label>
+          <Form.Control
+            name="length"
+            onChange={handleChange}
+            value={values.length}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Price (cost/kg)</Form.Label>
+          <Form.Control
+            name="price"
+            onChange={handleChange}
+            value={values.price}
+          />
+        </Form.Group>
+      </Form>
+      {values.material ? (
+        <ResultsCard
+          results={[
+            {
+              label: 'Volume',
+              content: (
+                <span>
+                  {volume.toFixed(2)} cm<sup>3</sup>
+                </span>
+              )
+            },
+            { label: 'Mass', content: <span>{mass.toFixed(2)} g</span> },
+            { label: 'Cost', content: <span>{cost.toFixed(2)}</span> },
+            {
+              label: 'Prints per kg',
+              content: <span>{Math.floor(1e3 / mass)}</span>
+            }
+          ]}
+        />
+      ) : (
+        <Alert variant="warning" className="my-4">
+          Select a material
+        </Alert>
       )}
     </Layout>
   );
