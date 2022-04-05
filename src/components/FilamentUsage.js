@@ -144,11 +144,7 @@ export default function FilamentUsage() {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {materials.map((material) => (
-                <Dropdown.Item
-                  key={material.name}
-                  eventKey={material.name}
-                  value={material.name}
-                >
+                <Dropdown.Item key={material.name} eventKey={material.name}>
                   {material.name}
                 </Dropdown.Item>
               ))}
