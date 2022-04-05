@@ -1,4 +1,5 @@
 import {
+  faGripLines,
   faRulerHorizontal,
   faWeightHanging,
   faWeightScale
@@ -33,6 +34,9 @@ export default function Header() {
             </Nav.Link>
             <Nav.Link as={Link} to="/extruder">
               <FontAwesomeIcon icon={faRulerHorizontal} /> Extruder Calibration
+            </Nav.Link>
+            <Nav.Link as={Link} to="/z-axis">
+              <FontAwesomeIcon icon={faGripLines} /> Z-Axis Calibration
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>

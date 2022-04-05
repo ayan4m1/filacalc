@@ -4,6 +4,7 @@ import Home from 'components/Home';
 import FilamentUsage from 'components/FilamentUsage';
 import SpoolUsage from 'components/SpoolUsage';
 import ExtruderCalibration from './ExtruderCalibration';
+import ZAxisCalibration from './ZAxisCalibration';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Route path="/filament" element={<FilamentUsage />} />
       <Route path="/spool" element={<SpoolUsage />} />
       <Route path="/extruder" element={<ExtruderCalibration />} />
+      <Route path="/z-axis" element={<ZAxisCalibration />} />
     </Routes>
   );
 }

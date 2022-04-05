@@ -48,3 +48,7 @@ export const materials = [
 
 export const getMaterial = (name) =>
   materials.find((material) => material.name === name);
+
+export const stepAngles = [1.8, 0.9, 7.5];
+
+export const leadscrewPitches = [1.25, 1, 12, 16, 25, 1.41111, 1.27, 1.5875];
