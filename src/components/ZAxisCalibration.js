@@ -1,12 +1,16 @@
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
-import { Button, Form, Dropdown, Card } from 'react-bootstrap';
+import { Button, Form, Dropdown, Card, Table } from 'react-bootstrap';
+
 import { leadscrewPitches, stepAngles } from 'utils';
 import Layout from './Layout';
 
 export default function ZAxisCalibration() {
   const [stepHeight, setStepHeight] = useState(null);
+  const [evenlyDivisible, setEvenlyDivisible] = useState(false);
+  const [layerHeights, setLayerHeights] = useState([]);
   const initialValues = {
+    layerHeight: 0.2,
     stepAngle: 1.8,
     customStepAngle: 0,
     leadscrewPitch: 1.25,
@@ -23,7 +27,64 @@ export default function ZAxisCalibration() {
           ? vals.customLeadscrewPitch
           : vals.leadscrewPitch;
 
-      setStepHeight((1.0 / (360.0 / stepAngle)) * leadscrewPitch);
+      const newStepHeight = leadscrewPitch / (360 / stepAngle);
+
+      setStepHeight(newStepHeight);
+      const heightMultiple = vals.layerHeight / newStepHeight;
+      const newEvenlyDivisible = Math.floor(heightMultiple) === heightMultiple;
+
+      setEvenlyDivisible(newEvenlyDivisible);
+
+      const newLayerHeights = [];
+
+      if (newEvenlyDivisible) {
+        newLayerHeights.push({
+          height: (heightMultiple - 1) * newStepHeight,
+          steps: heightMultiple - 1,
+          error: 0
+        });
+        newLayerHeights.push({
+          height: heightMultiple * newStepHeight,
+          steps: heightMultiple,
+          error: 0
+        });
+        newLayerHeights.push({
+          height: (heightMultiple + 1) * newStepHeight,
+          steps: heightMultiple + 1,
+          error: 0
+        });
+      } else {
+        newLayerHeights.push({
+          height: Math.floor(heightMultiple) * newStepHeight,
+          steps: Math.floor(heightMultiple),
+          error: 0
+        });
+        let error =
+          heightMultiple / newStepHeight -
+          Math.floor(heightMultiple / newStepHeight);
+
+        let errorSign = '-';
+
+        if (error > 0.5) {
+          error = 1 - error;
+          errorSign = '+';
+        }
+
+        error *= 1e2 / vals.layerHeight / 1e2;
+
+        newLayerHeights.push({
+          height: heightMultiple * newStepHeight,
+          steps: heightMultiple,
+          error: `${errorSign}${error}mm`
+        });
+        newLayerHeights.push({
+          height: Math.ceil(heightMultiple) * newStepHeight,
+          steps: Math.ceil(heightMultiple),
+          error: 0
+        });
+      }
+
+      setLayerHeights(newLayerHeights);
     }
   });
 
@@ -95,6 +156,15 @@ export default function ZAxisCalibration() {
           </Form.Group>
         )}
         <Form.Group>
+          <Form.Label>Layer Height (mm)</Form.Label>
+          <Form.Control
+            type="number"
+            name="layerHeight"
+            onChange={handleChange}
+            value={values.layerHeight}
+          />
+        </Form.Group>
+        <Form.Group>
           <Button type="primary" className="mt-4">
             Calculate
           </Button>
@@ -103,9 +173,45 @@ export default function ZAxisCalibration() {
       {Boolean(stepHeight) && (
         <Card body className="my-4">
           <Card.Title>Results</Card.Title>
+          {evenlyDivisible ? (
+            <p className="text-success">
+              Your layer height is evenly divisible by your step height!
+            </p>
+          ) : (
+            <p className="text-danger">
+              Your layer height is not evenly divisible by your step height!
+            </p>
+          )}
           <p>
-            Your layer height should be a multiple of {stepHeight.toFixed(6)}mm
+            Your layer height should be a multiple of{' '}
+            <strong>{stepHeight.toFixed(6)}mm</strong>
           </p>
+          <Table>
+            <thead>
+              <tr>
+                <th>Layer Height (mm)</th>
+                <th>Number of Steps</th>
+                <th>Error over 10cm (mm)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {layerHeights.map((layerHeight) => (
+                <tr key={layerHeight.height}>
+                  <td
+                    className={
+                      layerHeight.steps % 1 === 0
+                        ? 'text-success'
+                        : 'text-danger'
+                    }
+                  >
+                    {layerHeight.height.toFixed(4)}
+                  </td>
+                  <td>{layerHeight.steps}</td>
+                  <td>{layerHeight.error}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </Card>
       )}
     </Layout>
