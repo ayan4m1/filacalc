@@ -75,7 +75,7 @@ export default function ZAxisCalibration() {
         newLayerHeights.push({
           height: heightMultiple * newStepHeight,
           steps: heightMultiple,
-          error: `${errorSign}${error}mm`
+          error: `${errorSign}${error}`
         });
         newLayerHeights.push({
           height: Math.ceil(heightMultiple) * newStepHeight,
