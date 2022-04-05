@@ -49,6 +49,24 @@ export const materials = [
 export const getMaterial = (name) =>
   materials.find((material) => material.name === name);
 
+export const nozzles = [
+  { name: 'Mk8', diameter: 2.4, length: 13 },
+  { name: 'Mk10', diameter: 4, length: 13 },
+  { name: 'Volcano 1.75mm', diameter: 2, length: 21 },
+  { name: 'Volcano 3mm', diameter: 3.2, length: 21 }
+];
+
+export const getNozzle = (name) =>
+  nozzles.find((nozzle) => nozzle.name === name);
+
+export const hotends = [
+  { name: 'Ender 3', meltZoneDiameter: 2, meltZoneLength: 25 },
+  { name: 'Volcano', meltZoneDiameter: 6, meltZoneLength: 19 }
+];
+
+export const getHotend = (name) =>
+  hotends.find((hotend) => hotend.name === name);
+
 export const stepAngles = [1.8, 0.9, 7.5];
 
 export const leadscrewPitches = [1.25, 1, 12, 16, 25, 1.41111, 1.27, 1.5875];
