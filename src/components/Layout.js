@@ -1,21 +1,18 @@
-import PropTypes from 'prop-types';
 import { Fragment } from 'react';
+import { Container } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import { Outlet } from 'react-router-dom';
 
 import Header from 'components/Header';
-import { Container } from 'react-bootstrap';
 
-export default function Layout({ title, children }) {
+export default function Layout() {
   return (
     <Fragment>
-      <Helmet title={title || 'Filacalc'} />
+      <Helmet titleTemplate="Filacalc :: %s" />
       <Header />
-      <Container>{children}</Container>
+      <Container>
+        <Outlet />
+      </Container>
     </Fragment>
   );
 }
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-  title: PropTypes.string
-};

@@ -1,8 +1,7 @@
 import { useFormik } from 'formik';
-import { useCallback, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { Alert, Button, Form } from 'react-bootstrap';
-
-import Layout from 'components/Layout';
+import { Helmet } from 'react-helmet';
 
 export default function ExtruderCalibration() {
   const [newSteps, setNewSteps] = useState(0);
@@ -20,7 +19,8 @@ export default function ExtruderCalibration() {
   });
 
   return (
-    <Layout title="Extruder Calibration">
+    <Fragment>
+      <Helmet title="Extruder Calibration" />
       <h1>Extruder Steps Calibration</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
@@ -52,6 +52,6 @@ export default function ExtruderCalibration() {
           Corrected steps per mm: {newSteps.toFixed(2)}
         </Alert>
       )}
-    </Layout>
+    </Fragment>
   );
 }

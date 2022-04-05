@@ -1,8 +1,8 @@
 import { useFormik } from 'formik';
-import { useCallback } from 'react';
+import { Fragment, useCallback } from 'react';
 import { Form, Dropdown, Alert } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
-import Layout from 'components/Layout';
 import ResultsCard from 'components/ResultsCard';
 import { getMaterial, getSpool, materials, spools } from 'utils';
 
@@ -63,7 +63,8 @@ export default function SpoolUsage() {
   }
 
   return (
-    <Layout title="Spool Usage">
+    <Fragment>
+      <Helmet title="Spool Usage" />
       <h1>Spool Usage</h1>
       <Form>
         <Form.Group>
@@ -182,6 +183,6 @@ export default function SpoolUsage() {
           ]}
         />
       )}
-    </Layout>
+    </Fragment>
   );
 }

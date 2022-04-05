@@ -1,9 +1,9 @@
 import { useFormik } from 'formik';
-import { useCallback, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { Button, Form, Dropdown, Card, Table } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { leadscrewPitches, stepAngles } from 'utils';
-import Layout from './Layout';
 
 export default function ZAxisCalibration() {
   const [stepHeight, setStepHeight] = useState(null);
@@ -98,7 +98,8 @@ export default function ZAxisCalibration() {
   );
 
   return (
-    <Layout title="Z-Axis Calibration">
+    <Fragment>
+      <Helmet title="Z-Axis Calibration" />
       <h1>Z-Axis Calibration</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
@@ -214,6 +215,6 @@ export default function ZAxisCalibration() {
           </Table>
         </Card>
       )}
-    </Layout>
+    </Fragment>
   );
 }

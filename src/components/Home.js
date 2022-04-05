@@ -1,10 +1,12 @@
 import { Card } from 'react-bootstrap';
 
-import Layout from 'components/Layout';
+import { Helmet } from 'react-helmet';
+import { Fragment } from 'react';
 
 export default function Home() {
   return (
-    <Layout>
+    <Fragment>
+      <Helmet title="Home" />
       <Card body bg="light">
         <Card.Title>Welcome to Filacalc</Card.Title>
         <Card.Text>We provide utilities to help with 3D printing.</Card.Text>
@@ -13,6 +15,6 @@ export default function Home() {
           <a href="https://paypal.me/ayan4m1">donation</a> to the author.
         </Card.Text>
       </Card>
-    </Layout>
+    </Fragment>
   );
 }

@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Col,
   Row,
@@ -10,8 +10,8 @@ import {
   Alert,
   Container
 } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
-import Layout from 'components/Layout';
 import ResultsCard from 'components/ResultsCard';
 import parserWorker from 'workers/parser';
 import { createWebWorker, materials, getMaterial } from 'utils';
@@ -102,7 +102,8 @@ export default function FilamentUsage() {
 
   if (loading) {
     return (
-      <Layout title="Filament Usage">
+      <Fragment>
+        <Helmet title="Filament Usage" />
         <h1>Filament Usage</h1>
         <Container>
           <Row>
@@ -117,12 +118,13 @@ export default function FilamentUsage() {
             </Col>
           </Row>
         </Container>
-      </Layout>
+      </Fragment>
     );
   }
 
   return (
-    <Layout title="Filament Usage">
+    <Fragment>
+      <Helmet title="Filament Usage" />
       <h1>Filament Usage</h1>
       <Form>
         <Form.Group>
@@ -214,6 +216,6 @@ export default function FilamentUsage() {
           Select a material
         </Alert>
       )}
-    </Layout>
+    </Fragment>
   );
 }
