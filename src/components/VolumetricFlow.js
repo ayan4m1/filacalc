@@ -69,6 +69,25 @@ export default function VolumetricFlow() {
     [setFieldValue]
   );
 
+  let hotendLabel = 'Select One',
+    nozzleLabel = 'Select One';
+
+  if (values.hotend) {
+    if (values.hotend === 'custom') {
+      hotendLabel = 'Custom';
+    } else {
+      hotendLabel = values.hotend;
+    }
+  }
+
+  if (values.nozzle) {
+    if (values.nozzle === 'custom') {
+      nozzleLabel = 'Custom';
+    } else {
+      nozzleLabel = values.nozzle;
+    }
+  }
+
   return (
     <Fragment>
       <Helmet title="Volumetric Flow Optimization" />
@@ -78,9 +97,7 @@ export default function VolumetricFlow() {
         <Form.Group>
           <Form.Label>Type</Form.Label>
           <Dropdown onSelect={changeHotend}>
-            <Dropdown.Toggle variant="primary">
-              {values.hotend ? values.hotend : 'Select One'}
-            </Dropdown.Toggle>
+            <Dropdown.Toggle variant="primary">{hotendLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {hotends.map((hotend) => (
                 <Dropdown.Item key={hotend.name} eventKey={hotend.name}>
@@ -119,9 +136,7 @@ export default function VolumetricFlow() {
         <Form.Group>
           <Form.Label>Type</Form.Label>
           <Dropdown onSelect={changeNozzle}>
-            <Dropdown.Toggle variant="primary">
-              {values.nozzle ? values.nozzle : 'Select One'}
-            </Dropdown.Toggle>
+            <Dropdown.Toggle variant="primary">{nozzleLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {nozzles.map((nozzle) => (
                 <Dropdown.Item key={nozzle.name} eventKey={nozzle.name}>

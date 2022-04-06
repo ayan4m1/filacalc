@@ -62,6 +62,25 @@ export default function SpoolUsage() {
     }
   }
 
+  let brandLabel = 'Select One',
+    materialLabel = 'Select One';
+
+  if (values.brand) {
+    if (values.brand === 'custom') {
+      brandLabel = 'Custom';
+    } else {
+      brandLabel = values.brand;
+    }
+  }
+
+  if (values.material) {
+    if (values.material === 'custom') {
+      materialLabel = 'Custom';
+    } else {
+      materialLabel = values.material;
+    }
+  }
+
   return (
     <Fragment>
       <Helmet title="Spool Usage" />
@@ -70,9 +89,7 @@ export default function SpoolUsage() {
         <Form.Group>
           <Form.Label>Brand</Form.Label>
           <Dropdown onSelect={changeBrand}>
-            <Dropdown.Toggle variant="primary">
-              {values.brand ? values.brand : 'Select One'}
-            </Dropdown.Toggle>
+            <Dropdown.Toggle variant="primary">{brandLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {spools.map((spool) => (
                 <Dropdown.Item key={spool.brand} eventKey={spool.brand}>
@@ -97,9 +114,7 @@ export default function SpoolUsage() {
         <Form.Group>
           <Form.Label>Material</Form.Label>
           <Dropdown onSelect={changeMaterial}>
-            <Dropdown.Toggle variant="primary">
-              {values.material ? values.material : 'Select One'}
-            </Dropdown.Toggle>
+            <Dropdown.Toggle variant="primary">{materialLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {materials.map((material) => (
                 <Dropdown.Item key={material.name} eventKey={material.name}>
