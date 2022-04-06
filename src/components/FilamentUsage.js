@@ -24,12 +24,12 @@ export default function FilamentUsage() {
   const initialValues = {
     material: null,
     diameter: 1.75,
-    length: 1,
+    length: 0,
     price: 0,
     customMaterialDensity: 0
   };
 
-  const { values, handleChange, setFieldValue } = useFormik({
+  const { values, touched, handleChange, setFieldValue } = useFormik({
     initialValues
   });
 
@@ -122,6 +122,19 @@ export default function FilamentUsage() {
     );
   }
 
+  const showResults = Boolean(values.material);
+  const showWarning = !showResults && values.length > 0 && !touched.material;
+
+  let materialLabel = 'Select One';
+
+  if (values.material) {
+    if (values.material === 'custom') {
+      materialLabel = 'Custom';
+    } else {
+      materialLabel = values.material;
+    }
+  }
+
   return (
     <Fragment>
       <Helmet title="Filament Usage" />
@@ -141,9 +154,7 @@ export default function FilamentUsage() {
         <Form.Group>
           <Form.Label>Material</Form.Label>
           <Dropdown onSelect={changeMaterial}>
-            <Dropdown.Toggle variant="primary">
-              {values.material ? values.material : 'Select One'}
-            </Dropdown.Toggle>
+            <Dropdown.Toggle variant="primary">{materialLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {materials.map((material) => (
                 <Dropdown.Item key={material.name} eventKey={material.name}>
@@ -192,7 +203,7 @@ export default function FilamentUsage() {
           />
         </Form.Group>
       </Form>
-      {values.material ? (
+      {showResults && (
         <ResultsCard
           results={[
             {
@@ -211,7 +222,8 @@ export default function FilamentUsage() {
             }
           ]}
         />
-      ) : (
+      )}
+      {showWarning && (
         <Alert variant="warning" className="my-4">
           Select a material
         </Alert>
