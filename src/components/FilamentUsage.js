@@ -4,7 +4,6 @@ import {
   Col,
   Row,
   Form,
-  Dropdown,
   Spinner,
   ProgressBar,
   Alert,
@@ -33,10 +32,6 @@ export default function FilamentUsage() {
     setFieldValue('length', data.length.toFixed(2))
   );
 
-  const changeMaterial = useCallback(
-    (name) => setFieldValue('material', name),
-    [setFieldValue]
-  );
   const changeFile = useCallback(
     (event) => parse(event.target.files[0]),
     [parse]
@@ -91,16 +86,6 @@ export default function FilamentUsage() {
     }
   }
 
-  let materialLabel = 'Select One';
-
-  if (values.material) {
-    if (values.material === 'custom') {
-      materialLabel = 'Custom';
-    } else {
-      materialLabel = values.material;
-    }
-  }
-
   return (
     <Fragment>
       <Helmet title="Filament Usage" />
@@ -123,17 +108,19 @@ export default function FilamentUsage() {
         </Form.Group>
         <Form.Group>
           <Form.Label>Material</Form.Label>
-          <Dropdown onSelect={changeMaterial}>
-            <Dropdown.Toggle variant="primary">{materialLabel}</Dropdown.Toggle>
-            <Dropdown.Menu>
-              {materials.map((material) => (
-                <Dropdown.Item eventKey={material.name} key={material.name}>
-                  {material.name}
-                </Dropdown.Item>
-              ))}
-              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Form.Select
+            name="material"
+            onChange={handleChange}
+            value={values.material}
+          >
+            <option>Select One</option>
+            {materials.map((material) => (
+              <option key={material.name} value={material.name}>
+                {material.name}
+              </option>
+            ))}
+            <option value="custom">Custom</option>
+          </Form.Select>
         </Form.Group>
         {values.material === 'custom' && (
           <Form.Group>

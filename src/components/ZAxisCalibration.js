@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
-import { Fragment, useCallback, useState } from 'react';
-import { Button, Form, Dropdown, Table } from 'react-bootstrap';
+import { Fragment, useState } from 'react';
+import { Button, Form, Table } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import ResultsCard from 'components/ResultsCard';
@@ -20,17 +20,19 @@ export default function ZAxisCalibration() {
     printHeight: 100
   };
 
-  const { values, handleChange, handleSubmit, setFieldValue } = useFormik({
+  const { values, handleChange, handleSubmit } = useFormik({
     initialValues,
     onSubmit: (vals) => {
       setPrintHeight(vals.printHeight);
 
-      const stepAngle =
-        vals.stepAngle === 'custom' ? vals.customStepAngle : vals.stepAngle;
-      const leadscrewPitch =
+      const stepAngle = parseFloat(
+        vals.stepAngle === 'custom' ? vals.customStepAngle : vals.stepAngle
+      );
+      const leadscrewPitch = parseFloat(
         vals.leadscrewPitch === 'custom'
           ? vals.customLeadscrewPitch
-          : vals.leadscrewPitch;
+          : vals.leadscrewPitch
+      );
 
       const newStepHeight = leadscrewPitch / (360 / stepAngle);
 
@@ -93,15 +95,6 @@ export default function ZAxisCalibration() {
     }
   });
 
-  const changeStepAngle = useCallback(
-    (angle) => setFieldValue('stepAngle', parseFloat(angle)),
-    [setFieldValue]
-  );
-  const changeLeadscrewPitch = useCallback(
-    (pitch) => setFieldValue('leadscrewPitch', parseFloat(pitch)),
-    [setFieldValue]
-  );
-
   return (
     <Fragment>
       <Helmet title="Z-Axis Calibration" />
@@ -116,19 +109,14 @@ export default function ZAxisCalibration() {
       <Form onSubmit={handleSubmit}>
         <Form.Group>
           <Form.Label>Motor Step Angle (&deg;)</Form.Label>
-          <Dropdown onSelect={changeStepAngle}>
-            <Dropdown.Toggle variant="primary">
-              {values.stepAngle ? values.stepAngle : 'Select One'}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {stepAngles.map((stepAngle) => (
-                <Dropdown.Item eventKey={stepAngle} key={stepAngle}>
-                  {stepAngle} &deg;
-                </Dropdown.Item>
-              ))}
-              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Form.Select>
+            {stepAngles.map((stepAngle) => (
+              <option key={stepAngle} value={stepAngle}>
+                {stepAngle}
+              </option>
+            ))}
+            <option value="custom">Custom</option>
+          </Form.Select>
         </Form.Group>
         {values.stepAngle === 'custom' && (
           <Form.Group>
@@ -143,19 +131,18 @@ export default function ZAxisCalibration() {
         )}
         <Form.Group>
           <Form.Label>Leadscrew Pitch (mm/rev)</Form.Label>
-          <Dropdown onSelect={changeLeadscrewPitch}>
-            <Dropdown.Toggle variant="primary">
-              {values.leadscrewPitch ? values.leadscrewPitch : 'Select One'}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {leadscrewPitches.map((leadscrewPitch) => (
-                <Dropdown.Item eventKey={leadscrewPitch} key={leadscrewPitch}>
-                  {leadscrewPitch} mm/rev
-                </Dropdown.Item>
-              ))}
-              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Form.Select
+            name="leadscrewPitch"
+            onChange={handleChange}
+            value={values.leadscrewPitch}
+          >
+            {leadscrewPitches.map((leadscrewPitch) => (
+              <option key={leadscrewPitch} value={leadscrewPitch}>
+                {leadscrewPitch}
+              </option>
+            ))}
+            <option value="custom">Custom</option>
+          </Form.Select>
         </Form.Group>
         {values.leadscrewPitch === 'custom' && (
           <Form.Group>
