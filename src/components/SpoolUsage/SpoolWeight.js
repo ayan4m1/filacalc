@@ -38,11 +38,11 @@ export default function SpoolWeight() {
     const spoolMass =
       values.brand !== 'custom'
         ? getSpool(values.brand).mass
-        : values.customSpoolMass;
+        : parseFloat(values.customSpoolMass);
     const materialDensity =
       values.material !== 'custom'
         ? getMaterial(values.material).density
-        : values.customMaterialDensity;
+        : parseFloat(values.customMaterialDensity);
 
     remainingMass = Math.max(0, values.currentWeight - spoolMass);
 
@@ -117,6 +117,7 @@ export default function SpoolWeight() {
               Custom Material Density (g/cm<sup>3</sup>)
             </Form.Label>
             <Form.Control
+              min="0"
               name="customMaterialDensity"
               onChange={handleChange}
               type="number"
@@ -127,6 +128,7 @@ export default function SpoolWeight() {
         <Form.Group>
           <Form.Label>Filament Diameter (mm)</Form.Label>
           <Form.Control
+            min="0"
             name="diameter"
             onChange={handleChange}
             type="number"
@@ -136,6 +138,7 @@ export default function SpoolWeight() {
         <Form.Group>
           <Form.Label>Current Weight (g)</Form.Label>
           <Form.Control
+            min="0"
             name="currentWeight"
             onChange={handleChange}
             type="number"
@@ -145,6 +148,7 @@ export default function SpoolWeight() {
         <Form.Group>
           <Form.Label>Net Weight (g)</Form.Label>
           <Form.Control
+            min="0"
             name="netWeight"
             onChange={handleChange}
             type="number"
