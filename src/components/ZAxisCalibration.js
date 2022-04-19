@@ -1,11 +1,13 @@
 import { useFormik } from 'formik';
 import { Fragment, useCallback, useState } from 'react';
-import { Button, Form, Dropdown, Card, Table } from 'react-bootstrap';
+import { Button, Form, Dropdown, Table } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
+import ResultsCard from 'components/ResultsCard';
 import { leadscrewPitches, stepAngles } from 'utils';
 
 export default function ZAxisCalibration() {
+  const [printHeight, setPrintHeight] = useState(100);
   const [stepHeight, setStepHeight] = useState(null);
   const [evenlyDivisible, setEvenlyDivisible] = useState(false);
   const [layerHeights, setLayerHeights] = useState([]);
@@ -14,12 +16,15 @@ export default function ZAxisCalibration() {
     stepAngle: 1.8,
     customStepAngle: 0,
     leadscrewPitch: 1.25,
-    customLeadscrewPitch: 0
+    customLeadscrewPitch: 0,
+    printHeight: 100
   };
 
   const { values, handleChange, handleSubmit, setFieldValue } = useFormik({
     initialValues,
     onSubmit: (vals) => {
+      setPrintHeight(vals.printHeight);
+
       const stepAngle =
         vals.stepAngle === 'custom' ? vals.customStepAngle : vals.stepAngle;
       const leadscrewPitch =
@@ -70,7 +75,7 @@ export default function ZAxisCalibration() {
           errorSign = '+';
         }
 
-        error *= 1e2 / vals.layerHeight / 1e2;
+        error *= vals.printHeight / vals.layerHeight / 1e2;
 
         newLayerHeights.push({
           height: heightMultiple * newStepHeight,
@@ -101,6 +106,13 @@ export default function ZAxisCalibration() {
     <Fragment>
       <Helmet title="Z-Axis Calibration" />
       <h1>Z-Axis Calibration</h1>
+      <p>
+        Use this calculator to calibrate your layer heights based on your Z-axis
+        hardware. The goal is to use a layer height which is evenly divisble by
+        the smallest amount of motion your Z-axis is capable of producing. If
+        you do not do this, you can expect to see various print issues,
+        especially with tall prints as the error is cumulative.
+      </p>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
           <Form.Label>Motor Step Angle (&deg;)</Form.Label>
@@ -166,33 +178,47 @@ export default function ZAxisCalibration() {
           />
         </Form.Group>
         <Form.Group>
+          <Form.Label>Print Height (mm)</Form.Label>
+          <Form.Control
+            type="number"
+            name="printHeight"
+            onChange={handleChange}
+            value={values.printHeight}
+          />
+        </Form.Group>
+        <Form.Group>
           <Button type="primary" className="mt-4">
             Calculate
           </Button>
         </Form.Group>
       </Form>
       {Boolean(stepHeight) && (
-        <Card body className="my-4">
-          <Card.Title>Results</Card.Title>
-          {evenlyDivisible ? (
-            <p className="text-success">
-              Your layer height is evenly divisible by your step height!
-            </p>
-          ) : (
-            <p className="text-danger">
-              Your layer height is not evenly divisible by your step height!
-            </p>
-          )}
-          <p>
-            Your layer height should be a multiple of{' '}
-            <strong>{stepHeight.toFixed(6)}mm</strong>
-          </p>
+        <ResultsCard
+          results={[
+            {
+              label: 'Divisibility Check',
+              content: evenlyDivisible ? (
+                <p className="text-success">
+                  Your layer height is evenly divisible by your step height!
+                </p>
+              ) : (
+                <p className="text-danger">
+                  Your layer height is not evenly divisible by your step height!
+                </p>
+              )
+            },
+            {
+              label: 'Minimum Step Height',
+              content: `${stepHeight.toFixed(6)}mm`
+            }
+          ]}
+        >
           <Table>
             <thead>
               <tr>
                 <th>Layer Height (mm)</th>
                 <th>Number of Steps</th>
-                <th>Error over 10cm (mm)</th>
+                <th>Error over {printHeight / 10}cm (mm)</th>
               </tr>
             </thead>
             <tbody>
@@ -213,7 +239,7 @@ export default function ZAxisCalibration() {
               ))}
             </tbody>
           </Table>
-        </Card>
+        </ResultsCard>
       )}
     </Fragment>
   );
