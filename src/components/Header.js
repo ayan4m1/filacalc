@@ -2,7 +2,8 @@ import {
   faGripLines,
   faRulerHorizontal,
   faWeightHanging,
-  faWeightScale
+  faWeightScale,
+  faHeart
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Navbar, Nav, Container } from 'react-bootstrap';
@@ -46,7 +47,7 @@ export default function Header() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              Donate
+              <FontAwesomeIcon icon={faHeart} /> Donate
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
