@@ -42,29 +42,6 @@ export default function FilamentUsage() {
     [parse]
   );
 
-  let mass = 0,
-    volume = 0,
-    density = 0,
-    cost = 0;
-
-  if (
-    values.material ||
-    (values.customMaterialDensity && values.length > 0 && values.diameter > 0)
-  ) {
-    volume =
-      (Math.PI * Math.pow(values.diameter / 2.0, 2) * (values.length * 1e3)) /
-      1e3;
-    density =
-      values.material !== 'custom'
-        ? getMaterial(values.material).density
-        : values.customMaterialDensity;
-    mass = volume * density;
-
-    if (values.price > 0) {
-      cost = (mass / 1e3) * values.price;
-    }
-  }
-
   if (loading) {
     return (
       <Fragment>
@@ -87,8 +64,32 @@ export default function FilamentUsage() {
     );
   }
 
-  const showResults = Boolean(values.material);
+  let mass = 0,
+    volume = 0,
+    density = 0,
+    cost = 0;
+
+  const showResults = Boolean(
+    (values.material || values.customMaterialDensity) &&
+      values.length > 0 &&
+      values.diameter > 0
+  );
   const showWarning = !showResults && values.length > 0 && !touched.material;
+
+  if (showResults) {
+    volume =
+      (Math.PI * Math.pow(values.diameter / 2.0, 2) * (values.length * 1e3)) /
+      1e3;
+    density =
+      values.material !== 'custom'
+        ? getMaterial(values.material).density
+        : values.customMaterialDensity;
+    mass = volume * density;
+
+    if (values.price > 0) {
+      cost = (mass / 1e3) * values.price;
+    }
+  }
 
   let materialLabel = 'Select One';
 
@@ -176,6 +177,11 @@ export default function FilamentUsage() {
           />
         </Form.Group>
       </Form>
+      {showWarning && (
+        <Alert variant="warning" className="my-4">
+          Select a material.
+        </Alert>
+      )}
       {showResults && (
         <ResultsCard
           results={[
@@ -195,11 +201,6 @@ export default function FilamentUsage() {
             }
           ]}
         />
-      )}
-      {showWarning && (
-        <Alert variant="warning" className="my-4">
-          Select a material
-        </Alert>
       )}
     </Fragment>
   );

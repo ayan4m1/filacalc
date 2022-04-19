@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import { Fragment, useCallback } from 'react';
-import { Form, Dropdown, Alert } from 'react-bootstrap';
+import { Form, Dropdown, Alert, ProgressBar } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import ResultsCard from 'components/ResultsCard';
@@ -17,7 +17,9 @@ export default function SpoolUsage() {
     customMaterialDensity: 0
   };
 
-  const { values, handleChange, setFieldValue } = useFormik({ initialValues });
+  const { values, handleChange, setFieldValue, touched } = useFormik({
+    initialValues
+  });
 
   const changeBrand = useCallback(
     (name) => setFieldValue('brand', name),
@@ -28,16 +30,23 @@ export default function SpoolUsage() {
     [setFieldValue]
   );
 
+  const showResults = Boolean(
+    (values.brand || values.customSpoolMass) &&
+      (values.material || values.customMaterialDensity)
+  );
+  const showWarning =
+    !showResults &&
+    values.currentWeight > 0 &&
+    (!touched.brand || !touched.material);
+
   let remainingMass = 0,
     remainingPercent = 0,
     remainingVolume = 0,
     remainingLength = 0,
-    showWarning = false;
+    inconsistentWarning = false,
+    progressVariant = 'success';
 
-  if (
-    (values.brand || values.customSpoolMass) &&
-    (values.material || values.customMaterialDensity)
-  ) {
+  if (showResults) {
     const spoolMass =
       values.brand !== 'custom'
         ? getSpool(values.brand).mass
@@ -50,7 +59,7 @@ export default function SpoolUsage() {
     remainingMass = Math.max(0, values.currentWeight - spoolMass);
 
     if (remainingMass === 0) {
-      showWarning = true;
+      inconsistentWarning = true;
     }
 
     remainingVolume = remainingMass / materialDensity;
@@ -59,6 +68,12 @@ export default function SpoolUsage() {
 
     if (values.netWeight > 0) {
       remainingPercent = (remainingMass / values.netWeight) * 1e2;
+    }
+
+    if (remainingPercent <= 25) {
+      progressVariant = 'danger';
+    } else if (remainingPercent <= 50) {
+      progressVariant = 'warning';
     }
   }
 
@@ -85,6 +100,10 @@ export default function SpoolUsage() {
     <Fragment>
       <Helmet title="Spool Usage" />
       <h1>Spool Usage</h1>
+      <p>
+        Use this calculator to determine the amount of filament remaining on a
+        partially used spool.
+      </p>
       <Form>
         <Form.Group>
           <Form.Label>Brand</Form.Label>
@@ -167,11 +186,16 @@ export default function SpoolUsage() {
         </Form.Group>
       </Form>
       {showWarning && (
+        <Alert variant="warning" className="my-4">
+          Select a material and brand.
+        </Alert>
+      )}
+      {inconsistentWarning && (
         <Alert className="mt-4" variant="warning">
           Spool weight looks incorrect, it should be empty.
         </Alert>
       )}
-      {remainingMass > 0 && (
+      {showResults && (
         <ResultsCard
           title="Remaining Filament"
           results={[
@@ -181,7 +205,14 @@ export default function SpoolUsage() {
             },
             {
               label: 'Percentage',
-              content: <span>{Math.round(remainingPercent)} %</span>
+              content: (
+                <ProgressBar
+                  className="text-light"
+                  variant={progressVariant}
+                  now={remainingPercent}
+                  label={`${Math.round(remainingPercent)} %`}
+                />
+              )
             },
             {
               label: 'Length',
