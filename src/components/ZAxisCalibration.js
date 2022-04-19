@@ -1,16 +1,13 @@
-import { useFormik } from 'formik';
-import { Fragment, useState } from 'react';
-import { Button, Form, Table } from 'react-bootstrap';
+import { Fragment, useCallback } from 'react';
+import { Form, Table } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
+import FormErrors from 'components/FormErrors';
 import ResultsCard from 'components/ResultsCard';
+import useCalculatorForm from 'hooks/useCalculatorForm';
 import { leadscrewPitches, stepAngles } from 'utils';
 
 export default function ZAxisCalibration() {
-  const [printHeight, setPrintHeight] = useState(100);
-  const [stepHeight, setStepHeight] = useState(null);
-  const [evenlyDivisible, setEvenlyDivisible] = useState(false);
-  const [layerHeights, setLayerHeights] = useState([]);
   const initialValues = {
     layerHeight: 0.2,
     stepAngle: 1.8,
@@ -20,10 +17,30 @@ export default function ZAxisCalibration() {
     printHeight: 100
   };
 
-  const { values, handleChange, handleSubmit } = useFormik({
+  const {
+    formik: { values, handleChange },
+    results,
+    errors
+  } = useCalculatorForm({
     initialValues,
-    onSubmit: (vals) => {
-      setPrintHeight(vals.printHeight);
+    shouldShow: useCallback(() => true, []),
+    validate: useCallback((vals) => {
+      const result = [];
+
+      if (vals.stepAngle <= 0) {
+        result.push('Step angle must be greater than zero.');
+      }
+
+      if (vals.leadscrewPitch <= 0) {
+        result.push('Leadscrew pitch must be greater than zero.');
+      }
+
+      return result;
+    }, []),
+    calculate: useCallback((vals) => {
+      // eslint-disable-next-line
+      console.dir('calculating');
+      const layerHeights = [];
 
       const stepAngle = parseFloat(
         vals.stepAngle === 'custom' ? vals.customStepAngle : vals.stepAngle
@@ -34,45 +51,19 @@ export default function ZAxisCalibration() {
           : vals.leadscrewPitch
       );
 
-      const newStepHeight = leadscrewPitch / (360 / stepAngle);
+      const stepHeight = leadscrewPitch / (360 / stepAngle);
 
-      setStepHeight(newStepHeight);
-      const heightMultiple = vals.layerHeight / newStepHeight;
-      const newEvenlyDivisible = Math.floor(heightMultiple) === heightMultiple;
+      const heightMultiple = vals.layerHeight / stepHeight;
+      const evenlyDivisible = Math.floor(heightMultiple) === heightMultiple;
 
-      setEvenlyDivisible(newEvenlyDivisible);
-
-      if (newEvenlyDivisible) {
-        return;
-      }
-
-      const newLayerHeights = [];
-
-      if (newEvenlyDivisible) {
-        newLayerHeights.push({
-          height: (heightMultiple - 1) * newStepHeight,
-          steps: heightMultiple - 1,
-          error: 0
-        });
-        newLayerHeights.push({
-          height: heightMultiple * newStepHeight,
-          steps: heightMultiple,
-          error: 0
-        });
-        newLayerHeights.push({
-          height: (heightMultiple + 1) * newStepHeight,
-          steps: heightMultiple + 1,
-          error: 0
-        });
-      } else {
-        newLayerHeights.push({
-          height: Math.floor(heightMultiple) * newStepHeight,
+      if (!evenlyDivisible) {
+        layerHeights.push({
+          height: Math.floor(heightMultiple) * stepHeight,
           steps: Math.floor(heightMultiple),
           error: 0
         });
         let error =
-          heightMultiple / newStepHeight -
-          Math.floor(heightMultiple / newStepHeight);
+          heightMultiple / stepHeight - Math.floor(heightMultiple / stepHeight);
 
         let errorSign = '-';
 
@@ -83,20 +74,42 @@ export default function ZAxisCalibration() {
 
         error *= vals.printHeight / vals.layerHeight / 1e2;
 
-        newLayerHeights.push({
-          height: heightMultiple * newStepHeight,
+        layerHeights.push({
+          height: heightMultiple * stepHeight,
           steps: heightMultiple,
           error: `${errorSign}${error.toFixed(4)}`
         });
-        newLayerHeights.push({
-          height: Math.ceil(heightMultiple) * newStepHeight,
+        layerHeights.push({
+          height: Math.ceil(heightMultiple) * stepHeight,
           steps: Math.ceil(heightMultiple),
           error: 0
         });
       }
 
-      setLayerHeights(newLayerHeights);
-    }
+      return {
+        results: [
+          {
+            label: 'Divisibility Check',
+            content: evenlyDivisible ? (
+              <p className="text-success">
+                Your layer height is evenly divisible by your step height!
+              </p>
+            ) : (
+              <p className="text-danger">
+                Your layer height is not evenly divisible by your step height!
+              </p>
+            )
+          },
+          {
+            label: 'Minimum Step Height',
+            content: `${stepHeight.toFixed(6)}mm`
+          }
+        ],
+        layerHeights,
+        evenlyDivisible,
+        printHeight: vals.printHeight
+      };
+    }, [])
   });
 
   return (
@@ -110,10 +123,14 @@ export default function ZAxisCalibration() {
         you do not do this, you can expect to see various print issues,
         especially with tall prints as the error is cumulative.
       </p>
-      <Form onSubmit={handleSubmit}>
+      <Form>
         <Form.Group>
           <Form.Label>Motor Step Angle (&deg;)</Form.Label>
-          <Form.Select>
+          <Form.Select
+            name="stepAngle"
+            onChange={handleChange}
+            value={values.stepAngle}
+          >
             {stepAngles.map((stepAngle) => (
               <option key={stepAngle} value={stepAngle}>
                 {stepAngle}
@@ -181,44 +198,21 @@ export default function ZAxisCalibration() {
             evenly divisible by minimum step height.
           </Form.Text>
         </Form.Group>
-        <Form.Group>
-          <Button className="mt-4" type="primary">
-            Calculate
-          </Button>
-        </Form.Group>
       </Form>
-      {Boolean(stepHeight) && (
-        <ResultsCard
-          results={[
-            {
-              label: 'Divisibility Check',
-              content: evenlyDivisible ? (
-                <p className="text-success">
-                  Your layer height is evenly divisible by your step height!
-                </p>
-              ) : (
-                <p className="text-danger">
-                  Your layer height is not evenly divisible by your step height!
-                </p>
-              )
-            },
-            {
-              label: 'Minimum Step Height',
-              content: `${stepHeight.toFixed(6)}mm`
-            }
-          ]}
-        >
-          {!evenlyDivisible && (
+      <FormErrors errors={errors} />
+      {!errors?.length && Boolean(results) && (
+        <ResultsCard results={results.results}>
+          {!results.evenlyDivisible && (
             <Table>
               <thead>
                 <tr>
-                  <th>Layer Height (mm)</th>
+                  <th>Layer Height</th>
                   <th>Number of Steps</th>
-                  <th>Error over {printHeight / 10}cm (mm)</th>
+                  <th>Error over {results.printHeight / 10}cm</th>
                 </tr>
               </thead>
               <tbody>
-                {layerHeights.map((layerHeight) => (
+                {results.layerHeights.map((layerHeight) => (
                   <tr key={layerHeight.height}>
                     <td
                       className={
@@ -227,10 +221,10 @@ export default function ZAxisCalibration() {
                           : 'text-danger'
                       }
                     >
-                      {layerHeight.height.toFixed(4)}
+                      {layerHeight.height.toFixed(4)} mm
                     </td>
                     <td>{layerHeight.steps}</td>
-                    <td>{layerHeight.error}</td>
+                    <td>{layerHeight.error} mm</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,4 +1,3 @@
-import { useFormik } from 'formik';
 import { Fragment, useCallback } from 'react';
 import {
   Col,
@@ -6,14 +5,15 @@ import {
   Form,
   Spinner,
   ProgressBar,
-  Alert,
   Container
 } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
+import FormErrors from 'components/FormErrors';
 import ResultsCard from 'components/ResultsCard';
-import { materials, getMaterial } from 'utils';
+import useCalculatorForm from 'hooks/useCalculatorForm';
 import useParser from 'hooks/useParser';
+import { materials, getMaterial } from 'utils';
 
 export default function FilamentUsage() {
   const initialValues = {
@@ -24,13 +24,75 @@ export default function FilamentUsage() {
     customMaterialDensity: 0
   };
 
-  const { values, touched, handleChange, setFieldValue } = useFormik({
-    initialValues
+  const {
+    formik: { values, handleChange, handleBlur, setFieldValue },
+    results,
+    errors
+  } = useCalculatorForm({
+    initialValues,
+    shouldShow: useCallback(
+      (vals, touch) =>
+        touch.material || vals.material || touch.length || vals.length > 0,
+      []
+    ),
+    validate: useCallback((vals) => {
+      const result = [];
+
+      if (vals.length <= 0) {
+        result.push('Extrusion length must be greater than zero.');
+      }
+
+      if (vals.diameter <= 0) {
+        result.push('Filament diameter must be greater than zero.');
+      }
+
+      if (!vals.material) {
+        result.push('Select a material.');
+      }
+
+      return result;
+    }, []),
+    calculate: useCallback((vals) => {
+      const volume =
+        (Math.PI * Math.pow(vals.diameter / 2.0, 2) * (vals.length * 1e3)) /
+        1e3;
+      const density =
+        vals.material !== 'custom'
+          ? getMaterial(vals.material).density
+          : vals.customMaterialDensity;
+      const mass = volume * density;
+
+      let cost = 0;
+
+      if (vals.price > 0) {
+        cost = (mass / 1e3) * vals.price;
+      }
+
+      return [
+        {
+          label: 'Volume',
+          content: (
+            <span>
+              {volume.toFixed(2)} cm<sup>3</sup>
+            </span>
+          )
+        },
+        { label: 'Mass', content: <span>{mass.toFixed(2)} g</span> },
+        { label: 'Cost', content: <span>{cost.toFixed(2)}</span> },
+        {
+          label: 'Prints per kg',
+          content: <span>{Math.floor(1e3 / mass)}</span>
+        }
+      ];
+    }, [])
   });
 
-  const { loading, error, progress, parse } = useParser((data) =>
-    setFieldValue('length', data.length.toFixed(2))
-  );
+  const {
+    loading,
+    error: parserError,
+    progress,
+    parse
+  } = useParser((data) => setFieldValue('length', data.length.toFixed(2)));
 
   const changeFile = useCallback(
     (event) => parse(event.target.files[0]),
@@ -59,33 +121,6 @@ export default function FilamentUsage() {
     );
   }
 
-  let mass = 0,
-    volume = 0,
-    density = 0,
-    cost = 0;
-
-  const showResults = Boolean(
-    (values.material || values.customMaterialDensity) &&
-      values.length > 0 &&
-      values.diameter > 0
-  );
-  const showWarning = !showResults && values.length > 0 && !touched.material;
-
-  if (showResults) {
-    volume =
-      (Math.PI * Math.pow(values.diameter / 2.0, 2) * (values.length * 1e3)) /
-      1e3;
-    density =
-      values.material !== 'custom'
-        ? getMaterial(values.material).density
-        : values.customMaterialDensity;
-    mass = volume * density;
-
-    if (values.price > 0) {
-      cost = (mass / 1e3) * values.price;
-    }
-  }
-
   return (
     <Fragment>
       <Helmet title="Filament Usage" />
@@ -98,7 +133,11 @@ export default function FilamentUsage() {
       <Form>
         <Form.Group>
           <Form.Label>Select a G-code file</Form.Label>
-          <Form.Control isInvalid={error} onChange={changeFile} type="file" />
+          <Form.Control
+            isInvalid={parserError}
+            onChange={changeFile}
+            type="file"
+          />
           <Form.Text className="text-muted">
             Files are parsed in your browser, not sent to a server.
           </Form.Text>
@@ -110,6 +149,7 @@ export default function FilamentUsage() {
           <Form.Label>Material</Form.Label>
           <Form.Select
             name="material"
+            onBlur={handleBlur}
             onChange={handleChange}
             value={values.material}
           >
@@ -150,6 +190,7 @@ export default function FilamentUsage() {
           <Form.Control
             min="0"
             name="length"
+            onBlur={handleBlur}
             onChange={handleChange}
             value={values.length}
           />
@@ -164,31 +205,8 @@ export default function FilamentUsage() {
           />
         </Form.Group>
       </Form>
-      {showWarning && (
-        <Alert className="my-4" variant="warning">
-          Select a material.
-        </Alert>
-      )}
-      {showResults && (
-        <ResultsCard
-          results={[
-            {
-              label: 'Volume',
-              content: (
-                <span>
-                  {volume.toFixed(2)} cm<sup>3</sup>
-                </span>
-              )
-            },
-            { label: 'Mass', content: <span>{mass.toFixed(2)} g</span> },
-            { label: 'Cost', content: <span>{cost.toFixed(2)}</span> },
-            {
-              label: 'Prints per kg',
-              content: <span>{Math.floor(1e3 / mass)}</span>
-            }
-          ]}
-        />
-      )}
+      <FormErrors errors={errors} />
+      {!errors?.length && Boolean(results) && <ResultsCard results={results} />}
     </Fragment>
   );
 }

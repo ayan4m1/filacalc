@@ -1,7 +1,10 @@
-import { useFormik } from 'formik';
-import { Fragment } from 'react';
-import { Card, Form, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Fragment, useCallback } from 'react';
+import { Form, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+
+import FormErrors from 'components/FormErrors';
+import ResultsCard from 'components/ResultsCard';
+import useCalculatorForm from 'hooks/useCalculatorForm';
 
 export default function ExtruderCalibration() {
   const initialValues = {
@@ -11,20 +14,38 @@ export default function ExtruderCalibration() {
     extrusionPadding: 20
   };
 
-  const { values, handleChange } = useFormik({
-    initialValues
+  const {
+    formik: { values, handleChange },
+    results,
+    errors
+  } = useCalculatorForm({
+    initialValues,
+    shouldShow: useCallback(() => true, []),
+    validate: useCallback((vals) => {
+      const result = [];
+
+      if (vals.currentSteps <= 0) {
+        result.push('Current steps must be greater than zero.');
+      }
+
+      const actualExtrusion =
+        vals.extrusionLength + vals.extrusionPadding - vals.measuredOffset;
+
+      if (actualExtrusion <= 0) {
+        result.push('Inputs do not make sense.');
+      }
+
+      return result;
+    }, []),
+    calculate: useCallback((vals) => {
+      const actualExtrusion =
+        vals.extrusionLength + vals.extrusionPadding - vals.measuredOffset;
+      const stepsTaken = vals.currentSteps * vals.extrusionLength;
+      const stepsPerMm = stepsTaken / actualExtrusion;
+
+      return { stepsPerMm };
+    }, [])
   });
-
-  let newSteps = 100;
-
-  const actualExtrusion =
-    values.extrusionLength + values.extrusionPadding - values.measuredOffset;
-
-  if (actualExtrusion > 0) {
-    const stepsTaken = values.currentSteps * values.extrusionLength;
-
-    newSteps = stepsTaken / actualExtrusion;
-  }
 
   return (
     <Fragment>
@@ -119,13 +140,15 @@ export default function ExtruderCalibration() {
           </Form.Text>
         </Form.Group>
       </Form>
-      <Card body className="my-4">
-        <Card.Title>Results</Card.Title>
-        <p>
-          The corrected value is{' '}
-          <strong>{newSteps.toFixed(2)} steps/mm.</strong>
-        </p>
-      </Card>
+      <FormErrors errors={errors} />
+      {!errors?.length && Boolean(results) && (
+        <ResultsCard title="Result">
+          <p>
+            The corrected value is{' '}
+            <strong>{results.stepsPerMm.toFixed(2)} steps/mm.</strong>
+          </p>
+        </ResultsCard>
+      )}
     </Fragment>
   );
 }
