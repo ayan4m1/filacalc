@@ -42,6 +42,10 @@ export default function ZAxisCalibration() {
 
       setEvenlyDivisible(newEvenlyDivisible);
 
+      if (newEvenlyDivisible) {
+        return;
+      }
+
       const newLayerHeights = [];
 
       if (newEvenlyDivisible) {
@@ -200,32 +204,34 @@ export default function ZAxisCalibration() {
             }
           ]}
         >
-          <Table>
-            <thead>
-              <tr>
-                <th>Layer Height (mm)</th>
-                <th>Number of Steps</th>
-                <th>Error over {printHeight / 10}cm (mm)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {layerHeights.map((layerHeight) => (
-                <tr key={layerHeight.height}>
-                  <td
-                    className={
-                      layerHeight.steps % 1 === 0
-                        ? 'text-success'
-                        : 'text-danger'
-                    }
-                  >
-                    {layerHeight.height.toFixed(4)}
-                  </td>
-                  <td>{layerHeight.steps}</td>
-                  <td>{layerHeight.error}</td>
+          {!evenlyDivisible && (
+            <Table>
+              <thead>
+                <tr>
+                  <th>Layer Height (mm)</th>
+                  <th>Number of Steps</th>
+                  <th>Error over {printHeight / 10}cm (mm)</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {layerHeights.map((layerHeight) => (
+                  <tr key={layerHeight.height}>
+                    <td
+                      className={
+                        layerHeight.steps % 1 === 0
+                          ? 'text-success'
+                          : 'text-danger'
+                      }
+                    >
+                      {layerHeight.height.toFixed(4)}
+                    </td>
+                    <td>{layerHeight.steps}</td>
+                    <td>{layerHeight.error}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
         </ResultsCard>
       )}
     </Fragment>
