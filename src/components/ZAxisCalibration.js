@@ -176,6 +176,10 @@ export default function ZAxisCalibration() {
             type="number"
             value={values.printHeight}
           />
+          <Form.Text className="text-muted">
+            This is used to calculate accumulated error if layer height is not
+            evenly divisible by minimum step height.
+          </Form.Text>
         </Form.Group>
         <Form.Group>
           <Button className="mt-4" type="primary">
