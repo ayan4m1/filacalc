@@ -1,12 +1,11 @@
 import { useFormik } from 'formik';
-import { Fragment, useCallback } from 'react';
-import { Form, Dropdown, Alert, ProgressBar } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Fragment } from 'react';
+import { Form, Alert, ProgressBar } from 'react-bootstrap';
 
 import ResultsCard from 'components/ResultsCard';
 import { getMaterial, getSpool, materials, spools } from 'utils';
 
-export default function SpoolUsage() {
+export default function SpoolWeight() {
   const initialValues = {
     brand: null,
     material: null,
@@ -17,18 +16,7 @@ export default function SpoolUsage() {
     customMaterialDensity: 0
   };
 
-  const { values, handleChange, setFieldValue, touched } = useFormik({
-    initialValues
-  });
-
-  const changeBrand = useCallback(
-    (name) => setFieldValue('brand', name),
-    [setFieldValue]
-  );
-  const changeMaterial = useCallback(
-    (name) => setFieldValue('material', name),
-    [setFieldValue]
-  );
+  const { values, touched, handleChange } = useFormik({ initialValues });
 
   const showResults = Boolean(
     (values.brand || values.customSpoolMass) &&
@@ -77,47 +65,24 @@ export default function SpoolUsage() {
     }
   }
 
-  let brandLabel = 'Select One',
-    materialLabel = 'Select One';
-
-  if (values.brand) {
-    if (values.brand === 'custom') {
-      brandLabel = 'Custom';
-    } else {
-      brandLabel = values.brand;
-    }
-  }
-
-  if (values.material) {
-    if (values.material === 'custom') {
-      materialLabel = 'Custom';
-    } else {
-      materialLabel = values.material;
-    }
-  }
-
   return (
     <Fragment>
-      <Helmet title="Spool Usage" />
-      <h1>Spool Usage</h1>
-      <p>
-        Use this calculator to determine the amount of filament remaining on a
-        partially used spool.
-      </p>
       <Form>
         <Form.Group>
           <Form.Label>Brand</Form.Label>
-          <Dropdown onSelect={changeBrand}>
-            <Dropdown.Toggle variant="primary">{brandLabel}</Dropdown.Toggle>
-            <Dropdown.Menu>
-              {spools.map((spool) => (
-                <Dropdown.Item eventKey={spool.brand} key={spool.brand}>
-                  {spool.brand}
-                </Dropdown.Item>
-              ))}
-              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Form.Select
+            name="brand"
+            onChange={handleChange}
+            value={values.brand}
+          >
+            <option>Select One</option>
+            {spools.map((spool) => (
+              <option key={spool.brand} value={spool.brand}>
+                {spool.brand}
+              </option>
+            ))}
+            <option value="custom">Custom</option>
+          </Form.Select>
         </Form.Group>
         {values.brand === 'custom' && (
           <Form.Group>
@@ -132,17 +97,19 @@ export default function SpoolUsage() {
         )}
         <Form.Group>
           <Form.Label>Material</Form.Label>
-          <Dropdown onSelect={changeMaterial}>
-            <Dropdown.Toggle variant="primary">{materialLabel}</Dropdown.Toggle>
-            <Dropdown.Menu>
-              {materials.map((material) => (
-                <Dropdown.Item eventKey={material.name} key={material.name}>
-                  {material.name}
-                </Dropdown.Item>
-              ))}
-              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Form.Select
+            name="material"
+            onChange={handleChange}
+            value={values.material}
+          >
+            <option>Select One</option>
+            {materials.map((material) => (
+              <option key={material.name} value={material.name}>
+                {material.name}
+              </option>
+            ))}
+            <option value="custom">Custom</option>
+          </Form.Select>
         </Form.Group>
         {values.material === 'custom' && (
           <Form.Group>
