@@ -40,6 +40,15 @@ export default function Header() {
               <FontAwesomeIcon icon={faGripLines} /> Z-Axis Calibration
             </Nav.Link>
           </Nav>
+          <Nav className="ms-auto">
+            <Nav.Link
+              href="https://paypal.me/ayan4m1"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Donate
+            </Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>

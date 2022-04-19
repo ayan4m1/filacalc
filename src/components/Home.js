@@ -10,10 +10,6 @@ export default function Home() {
       <Card bg="light" body>
         <Card.Title>Welcome to Filacalc</Card.Title>
         <Card.Text>We provide utilities to help with 3D printing.</Card.Text>
-        <Card.Text>
-          If these utilities help you, consider a{' '}
-          <a href="https://paypal.me/ayan4m1">donation</a> to the author.
-        </Card.Text>
       </Card>
     </Fragment>
   );
