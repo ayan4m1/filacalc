@@ -1,28 +1,45 @@
-import ResultsCard from 'components/ResultsCard';
 import { useFormik } from 'formik';
 import { Fragment } from 'react';
-import { Form } from 'react-bootstrap';
+import { Alert, Form } from 'react-bootstrap';
+
+import ResultsCard from 'components/ResultsCard';
+import { materials, getMaterial } from 'utils';
 
 export default function SpoolDimensions() {
   const initialValues = {
+    material: '',
+    customMaterialDensity: 0,
     filamentDiameter: 1.75,
     outerDiameter: 0,
     spoolDiameter: 0,
     spoolWidth: 0
   };
 
-  const { values, handleChange } = useFormik({ initialValues });
+  const { values, touched, handleChange } = useFormik({ initialValues });
 
   const showResults = Boolean(
-    values.outerDiameter > 0 &&
+    (values.material || values.customMaterialDensity) &&
+      values.outerDiameter > 0 &&
       values.spoolDiameter > 0 &&
       values.spoolWidth > 0
   );
+  const showWarning =
+    !showResults &&
+    values.outerDiameter > 0 &&
+    values.spoolDiameter > 0 &&
+    values.spoolWidth > 0 &&
+    !touched.material;
 
   let remainingLength = 0,
-    remainingVolume = 0;
+    remainingVolume = 0,
+    remainingMass = 0;
 
   if (showResults) {
+    const materialDensity =
+      values.material !== 'custom'
+        ? getMaterial(values.material).density
+        : parseFloat(values.customMaterialDensity);
+
     remainingLength =
       ((Math.pow(values.outerDiameter, 2) - Math.pow(values.spoolDiameter, 2)) *
         Math.PI *
@@ -33,12 +50,43 @@ export default function SpoolDimensions() {
       1e3;
     remainingVolume =
       Math.PI * Math.pow(values.filamentDiameter / 2, 2) * remainingLength;
+    remainingMass = materialDensity * remainingVolume;
   }
 
   return (
     <Fragment>
       <Form>
         <Form.Group>
+          <Form.Group>
+            <Form.Label>Material</Form.Label>
+            <Form.Select
+              name="material"
+              onChange={handleChange}
+              value={values.material}
+            >
+              <option>Select One</option>
+              {materials.map((material) => (
+                <option key={material.name} value={material.name}>
+                  {material.name}
+                </option>
+              ))}
+              <option value="custom">Custom</option>
+            </Form.Select>
+          </Form.Group>
+          {values.material === 'custom' && (
+            <Form.Group>
+              <Form.Label>
+                Custom Material Density (g/cm<sup>3</sup>)
+              </Form.Label>
+              <Form.Control
+                min="0"
+                name="customMaterialDensity"
+                onChange={handleChange}
+                type="number"
+                value={values.customMaterialDensity}
+              />
+            </Form.Group>
+          )}
           <Form.Label>Filament diameter (mm)</Form.Label>
           <Form.Control
             min="0"
@@ -79,6 +127,11 @@ export default function SpoolDimensions() {
           />
         </Form.Group>
       </Form>
+      {showWarning && (
+        <Alert className="my-4" variant="warning">
+          Select a material.
+        </Alert>
+      )}
       {showResults && (
         <ResultsCard
           results={[
@@ -93,6 +146,10 @@ export default function SpoolDimensions() {
                   {remainingVolume.toFixed(2)} cm<sup>3</sup>
                 </span>
               )
+            },
+            {
+              label: 'Mass',
+              content: `${remainingMass.toFixed(2)} g`
             }
           ]}
           title="Remaining Filament"
