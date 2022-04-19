@@ -17,7 +17,7 @@ import useParser from 'hooks/useParser';
 
 export default function FilamentUsage() {
   const initialValues = {
-    material: null,
+    material: '',
     diameter: 1.75,
     length: 0,
     price: 0,

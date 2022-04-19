@@ -7,8 +7,8 @@ import { getMaterial, getSpool, materials, spools } from 'utils';
 
 export default function SpoolWeight() {
   const initialValues = {
-    brand: null,
-    material: null,
+    brand: '',
+    material: '',
     diameter: 1.75,
     netWeight: 1000,
     currentWeight: 0,
