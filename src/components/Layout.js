@@ -9,7 +9,7 @@ import Header from 'components/Header';
 export default function Layout({ children }) {
   return (
     <Fragment>
-      <Helmet titleTemplate="Filacalc :: %s" />
+      <Helmet titleTemplate="Filacalc - %s" />
       <Header />
       <Container>
         <Outlet />
