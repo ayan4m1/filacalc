@@ -12,14 +12,15 @@ import spoolLogo from 'images/filament-spool.svg';
 
 export default function Header() {
   return (
-    <Navbar variant="dark" bg="dark" expand="lg" className="mb-4">
+    <Navbar bg="dark" className="mb-4" expand="lg" variant="dark">
       <Container>
         <Navbar.Brand as={Link} to="/">
           <img
-            src={spoolLogo}
-            width={64}
-            style={{ stroke: '#b58900' }}
             alt="Filament Spool"
+            className="me-2"
+            src={spoolLogo}
+            style={{ stroke: '#b58900' }}
+            width={64}
           />{' '}
           Filacalc
         </Navbar.Brand>

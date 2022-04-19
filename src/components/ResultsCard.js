@@ -7,10 +7,10 @@ export default function ResultsCard({ children, results, title = 'Results' }) {
       <Card.Title>{title}</Card.Title>
       {results.map((result, index) => (
         <Row
-          key={result.label}
           className={
             Boolean(children) && index === results.length - 1 ? 'mb-4' : null
           }
+          key={result.label}
         >
           <Col xs={2}>
             <strong>{result.label}</strong>

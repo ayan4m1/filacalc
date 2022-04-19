@@ -122,7 +122,7 @@ export default function ZAxisCalibration() {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {stepAngles.map((stepAngle) => (
-                <Dropdown.Item key={stepAngle} eventKey={stepAngle}>
+                <Dropdown.Item eventKey={stepAngle} key={stepAngle}>
                   {stepAngle} &deg;
                 </Dropdown.Item>
               ))}
@@ -134,9 +134,9 @@ export default function ZAxisCalibration() {
           <Form.Group>
             <Form.Label>Custom Step Angle (&deg;)</Form.Label>
             <Form.Control
-              type="number"
               name="customStepAngle"
               onChange={handleChange}
+              type="number"
               value={values.customStepAngle}
             />
           </Form.Group>
@@ -149,7 +149,7 @@ export default function ZAxisCalibration() {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {leadscrewPitches.map((leadscrewPitch) => (
-                <Dropdown.Item key={leadscrewPitch} eventKey={leadscrewPitch}>
+                <Dropdown.Item eventKey={leadscrewPitch} key={leadscrewPitch}>
                   {leadscrewPitch} mm/rev
                 </Dropdown.Item>
               ))}
@@ -161,9 +161,9 @@ export default function ZAxisCalibration() {
           <Form.Group>
             <Form.Label>Leadscrew Pitch (mm/rev)</Form.Label>
             <Form.Control
-              type="number"
               name="leadscrewPitch"
               onChange={handleChange}
+              type="number"
               value={values.leadscrewPitch}
             />
           </Form.Group>
@@ -171,23 +171,23 @@ export default function ZAxisCalibration() {
         <Form.Group>
           <Form.Label>Layer Height (mm)</Form.Label>
           <Form.Control
-            type="number"
             name="layerHeight"
             onChange={handleChange}
+            type="number"
             value={values.layerHeight}
           />
         </Form.Group>
         <Form.Group>
           <Form.Label>Print Height (mm)</Form.Label>
           <Form.Control
-            type="number"
             name="printHeight"
             onChange={handleChange}
+            type="number"
             value={values.printHeight}
           />
         </Form.Group>
         <Form.Group>
-          <Button type="primary" className="mt-4">
+          <Button className="mt-4" type="primary">
             Calculate
           </Button>
         </Form.Group>

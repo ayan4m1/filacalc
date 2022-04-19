@@ -164,7 +164,8 @@ module.exports = {
     'prettier/prettier': 2,
     'jsx-a11y/label-has-for': 0,
     'react/jsx-uses-react': 0,
-    'react/react-in-jsx-scope': 0
+    'react/react-in-jsx-scope': 0,
+    'react/jsx-sort-props': 2
   },
   settings: {
     react: {

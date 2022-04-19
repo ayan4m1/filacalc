@@ -100,7 +100,7 @@ export default function VolumetricFlow() {
             <Dropdown.Toggle variant="primary">{hotendLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {hotends.map((hotend) => (
-                <Dropdown.Item key={hotend.name} eventKey={hotend.name}>
+                <Dropdown.Item eventKey={hotend.name} key={hotend.name}>
                   {hotend.name}
                 </Dropdown.Item>
               ))}
@@ -115,19 +115,19 @@ export default function VolumetricFlow() {
             <Form.Group>
               <Form.Label>Length (mm)</Form.Label>
               <Form.Control
-                type="number"
                 name="customMeltZoneLength"
-                value={values.customMeltZoneLength}
                 onChange={handleChange}
+                type="number"
+                value={values.customMeltZoneLength}
               />
             </Form.Group>
             <Form.Group>
               <Form.Label>Diameter (mm)</Form.Label>
               <Form.Control
-                type="number"
                 name="customMeltZoneDiameter"
-                value={values.customMeltZoneDiameter}
                 onChange={handleChange}
+                type="number"
+                value={values.customMeltZoneDiameter}
               />
             </Form.Group>
           </Fragment>
@@ -139,7 +139,7 @@ export default function VolumetricFlow() {
             <Dropdown.Toggle variant="primary">{nozzleLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {nozzles.map((nozzle) => (
-                <Dropdown.Item key={nozzle.name} eventKey={nozzle.name}>
+                <Dropdown.Item eventKey={nozzle.name} key={nozzle.name}>
                   {nozzle.name}
                 </Dropdown.Item>
               ))}
@@ -154,19 +154,19 @@ export default function VolumetricFlow() {
             <Form.Group>
               <Form.Label>Interior Diameter (mm)</Form.Label>
               <Form.Control
-                type="number"
                 name="customNozzleDiameter"
-                value={values.customNozzleDiameter}
                 onChange={handleChange}
+                type="number"
+                value={values.customNozzleDiameter}
               />
             </Form.Group>
             <Form.Group>
               <Form.Label>Interior Length (mm)</Form.Label>
               <Form.Control
-                type="number"
                 name="customNozzleLength"
-                value={values.customNozzleLength}
                 onChange={handleChange}
+                type="number"
+                value={values.customNozzleLength}
               />
             </Form.Group>
           </Fragment>
@@ -174,42 +174,42 @@ export default function VolumetricFlow() {
         <Form.Group>
           <Form.Label>Diameter (mm)</Form.Label>
           <Form.Control
-            type="number"
             name="nozzleDiameter"
-            value={values.nozzleDiameter}
             onChange={handleChange}
+            type="number"
+            value={values.nozzleDiameter}
           />
         </Form.Group>
         <h3>Slicing Parameters</h3>
         <Form.Group>
           <Form.Label>Layer Height (mm)</Form.Label>
           <Form.Control
-            type="number"
             name="layerHeight"
-            value={values.layerHeight}
             onChange={handleChange}
+            type="number"
+            value={values.layerHeight}
           />
         </Form.Group>
         <Form.Group>
           <Form.Label>Extrusion Width (mm)</Form.Label>
           <Form.Control
-            type="number"
             name="extrusionWidth"
-            value={values.extrusionWidth}
             onChange={handleChange}
+            type="number"
+            value={values.extrusionWidth}
           />
         </Form.Group>
         <Form.Group>
           <Form.Label>Print Speed (mm/s)</Form.Label>
           <Form.Control
-            type="number"
             name="printSpeed"
-            value={values.printSpeed}
             onChange={handleChange}
+            type="number"
+            value={values.printSpeed}
           />
         </Form.Group>
         <Form.Group>
-          <Button variant="primary" type="submit" className="mt-4">
+          <Button className="mt-4" type="submit" variant="primary">
             Calculate
           </Button>
         </Form.Group>

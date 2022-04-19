@@ -61,11 +61,11 @@ export default function ExtruderCalibration() {
         <Form.Group>
           <Form.Label>Current Steps per mm</Form.Label>
           <Form.Control
-            type="number"
-            name="currentSteps"
             min="0"
-            value={values.currentSteps}
+            name="currentSteps"
             onChange={handleChange}
+            type="number"
+            value={values.currentSteps}
           />
           <Form.Text className="text-muted">
             To find your current steps per mm, look in one of two places: your
@@ -78,11 +78,11 @@ export default function ExtruderCalibration() {
         <Form.Group>
           <Form.Label>Extrusion Length (mm)</Form.Label>
           <Form.Control
-            type="number"
-            name="extrusionLength"
             min="0"
-            value={values.extrusionLength}
+            name="extrusionLength"
             onChange={handleChange}
+            type="number"
+            value={values.extrusionLength}
           />
           <Form.Text className="text-muted">
             An extrusion length of 100mm allows for enough error to build up to
@@ -93,11 +93,11 @@ export default function ExtruderCalibration() {
         <Form.Group>
           <Form.Label>Extrusion Padding (mm)</Form.Label>
           <Form.Control
-            type="number"
-            name="extrusionPadding"
             min="0"
-            value={values.extrusionPadding}
+            name="extrusionPadding"
             onChange={handleChange}
+            type="number"
+            value={values.extrusionPadding}
           />
           <Form.Text className="text-muted">
             This is an arbitrary value.
@@ -108,11 +108,11 @@ export default function ExtruderCalibration() {
             Measured Length Between Extrusion and Marking (mm)
           </Form.Label>
           <Form.Control
-            type="number"
-            name="measuredOffset"
             min="0"
-            value={values.measuredOffset}
+            name="measuredOffset"
             onChange={handleChange}
+            type="number"
+            value={values.measuredOffset}
           />
           <Form.Text className="text-primary">
             Enter your measurement here after following the steps above.

@@ -56,7 +56,7 @@ export default function FilamentUsage() {
           <Row>
             <Col className="text-center">
               <Spinner animation="border" className="my-3" />
-              <ProgressBar variant="primary" animated now={progress} />
+              <ProgressBar animated now={progress} variant="primary" />
             </Col>
           </Row>
         </Container>
@@ -113,7 +113,7 @@ export default function FilamentUsage() {
       <Form>
         <Form.Group>
           <Form.Label>Select a G-code file</Form.Label>
-          <Form.Control type="file" onChange={changeFile} isInvalid={error} />
+          <Form.Control isInvalid={error} onChange={changeFile} type="file" />
           <Form.Text className="text-muted">
             Files are parsed in your browser, not sent to a server.
           </Form.Text>
@@ -127,7 +127,7 @@ export default function FilamentUsage() {
             <Dropdown.Toggle variant="primary">{materialLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {materials.map((material) => (
-                <Dropdown.Item key={material.name} eventKey={material.name}>
+                <Dropdown.Item eventKey={material.name} key={material.name}>
                   {material.name}
                 </Dropdown.Item>
               ))}
@@ -141,19 +141,19 @@ export default function FilamentUsage() {
               Custom Material Density (g/cm<sup>3</sup>)
             </Form.Label>
             <Form.Control
-              type="number"
               min="0"
               name="customMaterialDensity"
-              value={values.customMaterialDensity}
               onChange={handleChange}
+              type="number"
+              value={values.customMaterialDensity}
             />
           </Form.Group>
         )}
         <Form.Group>
           <Form.Label>Diameter (mm)</Form.Label>
           <Form.Control
-            name="diameter"
             min="0"
+            name="diameter"
             onChange={handleChange}
             value={values.diameter}
           />
@@ -161,8 +161,8 @@ export default function FilamentUsage() {
         <Form.Group>
           <Form.Label>Length (m)</Form.Label>
           <Form.Control
-            name="length"
             min="0"
+            name="length"
             onChange={handleChange}
             value={values.length}
           />
@@ -170,15 +170,15 @@ export default function FilamentUsage() {
         <Form.Group>
           <Form.Label>Price (cost/kg)</Form.Label>
           <Form.Control
-            name="price"
             min="0"
+            name="price"
             onChange={handleChange}
             value={values.price}
           />
         </Form.Group>
       </Form>
       {showWarning && (
-        <Alert variant="warning" className="my-4">
+        <Alert className="my-4" variant="warning">
           Select a material.
         </Alert>
       )}

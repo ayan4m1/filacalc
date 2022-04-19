@@ -27,13 +27,13 @@ export default function App() {
   return (
     <Suspense fallback={<SuspenseFallback />}>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="/filament" element={<FilamentUsage />} />
-          <Route path="/spool" element={<SpoolUsage />} />
-          <Route path="/extruder" element={<ExtruderCalibration />} />
-          <Route path="/flow" element={<VolumetricFlow />} />
-          <Route path="/z-axis" element={<ZAxisCalibration />} />
+        <Route element={<Layout />} path="/">
+          <Route element={<Home />} index />
+          <Route element={<FilamentUsage />} path="/filament" />
+          <Route element={<SpoolUsage />} path="/spool" />
+          <Route element={<ExtruderCalibration />} path="/extruder" />
+          <Route element={<VolumetricFlow />} path="/flow" />
+          <Route element={<ZAxisCalibration />} path="/z-axis" />
         </Route>
       </Routes>
     </Suspense>

@@ -111,7 +111,7 @@ export default function SpoolUsage() {
             <Dropdown.Toggle variant="primary">{brandLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {spools.map((spool) => (
-                <Dropdown.Item key={spool.brand} eventKey={spool.brand}>
+                <Dropdown.Item eventKey={spool.brand} key={spool.brand}>
                   {spool.brand}
                 </Dropdown.Item>
               ))}
@@ -123,10 +123,10 @@ export default function SpoolUsage() {
           <Form.Group>
             <Form.Label>Custom Spool Mass (g)</Form.Label>
             <Form.Control
-              type="number"
               name="customSpoolMass"
-              value={values.customSpoolMass}
               onChange={handleChange}
+              type="number"
+              value={values.customSpoolMass}
             />
           </Form.Group>
         )}
@@ -136,7 +136,7 @@ export default function SpoolUsage() {
             <Dropdown.Toggle variant="primary">{materialLabel}</Dropdown.Toggle>
             <Dropdown.Menu>
               {materials.map((material) => (
-                <Dropdown.Item key={material.name} eventKey={material.name}>
+                <Dropdown.Item eventKey={material.name} key={material.name}>
                   {material.name}
                 </Dropdown.Item>
               ))}
@@ -150,43 +150,43 @@ export default function SpoolUsage() {
               Custom Material Density (g/cm<sup>3</sup>)
             </Form.Label>
             <Form.Control
-              type="number"
               name="customMaterialDensity"
-              value={values.customMaterialDensity}
               onChange={handleChange}
+              type="number"
+              value={values.customMaterialDensity}
             />
           </Form.Group>
         )}
         <Form.Group>
           <Form.Label>Filament Diameter (mm)</Form.Label>
           <Form.Control
-            type="number"
             name="diameter"
             onChange={handleChange}
+            type="number"
             value={values.diameter}
           />
         </Form.Group>
         <Form.Group>
           <Form.Label>Current Weight (g)</Form.Label>
           <Form.Control
-            type="number"
             name="currentWeight"
             onChange={handleChange}
+            type="number"
             value={values.currentWeight}
           />
         </Form.Group>
         <Form.Group>
           <Form.Label>Net Weight (g)</Form.Label>
           <Form.Control
-            type="number"
             name="netWeight"
             onChange={handleChange}
+            type="number"
             value={values.netWeight}
           />
         </Form.Group>
       </Form>
       {showWarning && (
-        <Alert variant="warning" className="my-4">
+        <Alert className="my-4" variant="warning">
           Select a material and brand.
         </Alert>
       )}
@@ -197,7 +197,6 @@ export default function SpoolUsage() {
       )}
       {showResults && (
         <ResultsCard
-          title="Remaining Filament"
           results={[
             {
               label: 'Mass',
@@ -208,9 +207,9 @@ export default function SpoolUsage() {
               content: (
                 <ProgressBar
                   className="text-light"
-                  variant={progressVariant}
-                  now={remainingPercent}
                   label={`${Math.round(remainingPercent)} %`}
+                  now={remainingPercent}
+                  variant={progressVariant}
                 />
               )
             },
@@ -227,6 +226,7 @@ export default function SpoolUsage() {
               )
             }
           ]}
+          title="Remaining Filament"
         />
       )}
     </Fragment>
