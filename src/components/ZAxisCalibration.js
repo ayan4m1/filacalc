@@ -200,7 +200,7 @@ export default function ZAxisCalibration() {
         </Form.Group>
       </Form>
       <FormErrors errors={errors} />
-      {!errors?.length && Boolean(results) && (
+      {Boolean(results) && (
         <ResultsCard results={results.results}>
           {!results.evenlyDivisible && (
             <Table>

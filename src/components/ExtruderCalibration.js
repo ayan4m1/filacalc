@@ -141,7 +141,7 @@ export default function ExtruderCalibration() {
         </Form.Group>
       </Form>
       <FormErrors errors={errors} />
-      {!errors?.length && Boolean(results) && (
+      {Boolean(results) && (
         <ResultsCard title="Result">
           <p>
             The corrected value is{' '}
