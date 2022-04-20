@@ -67,7 +67,7 @@ export default function ExtruderCalibration() {
           mark the filament there.
         </ListGroupItem>
         <ListGroupItem>
-          <strong>2.</strong> Manually extrude the specified extrusion length.
+          <strong>2.</strong> Manually extrude {values.extrusionLength}mm.
         </ListGroupItem>
         <ListGroupItem>
           <strong>3.</strong> Using calipers, measure the distance from where

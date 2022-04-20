@@ -38,8 +38,6 @@ export default function ZAxisCalibration() {
       return result;
     }, []),
     calculate: useCallback((vals) => {
-      // eslint-disable-next-line
-      console.dir('calculating');
       const layerHeights = [];
 
       const stepAngle = parseFloat(
