@@ -1,8 +1,9 @@
-import { useFormik } from 'formik';
-import { Fragment } from 'react';
-import { Alert, Form } from 'react-bootstrap';
+import { Fragment, useCallback } from 'react';
+import { Form } from 'react-bootstrap';
 
+import FormErrors from 'components/FormErrors';
 import ResultsCard from 'components/ResultsCard';
+import useCalculatorForm from 'hooks/useCalculatorForm';
 import { materials, getMaterial } from 'utils';
 
 export default function SpoolDimensions() {
@@ -15,45 +16,85 @@ export default function SpoolDimensions() {
     spoolWidth: 0
   };
 
-  const { values, touched, handleChange, handleBlur } = useFormik({
-    initialValues
+  const {
+    formik: { values, handleChange, handleBlur },
+    results,
+    errors
+  } = useCalculatorForm({
+    initialValues,
+    shouldShow: useCallback(
+      (vals, touched) =>
+        touched.material ||
+        vals.material ||
+        touched.outerDiameter ||
+        touched.spoolDiameter ||
+        touched.spoolWidth,
+      []
+    ),
+    validate: useCallback((vals) => {
+      const result = [];
+
+      if (!vals.material) {
+        result.push('Select a material.');
+      }
+
+      if (vals.outerDiameter <= 0) {
+        result.push('Filament outer diameter must be greater than zero.');
+      }
+
+      if (vals.spoolDiameter <= 0) {
+        result.push('Spool diameter must be greater than zero.');
+      }
+
+      if (vals.spoolDiameter > vals.outerDiameter) {
+        result.push(
+          'Spool diameter should be less than filament outer diameter.'
+        );
+      }
+
+      if (vals.spoolWidth <= 0) {
+        result.push('Spool width must be greater than zero.');
+      }
+
+      return result;
+    }, []),
+    calculate: useCallback((vals) => {
+      const materialDensity =
+        vals.material !== 'custom'
+          ? getMaterial(vals.material).density
+          : parseFloat(vals.customMaterialDensity);
+      const remainingLength =
+        ((Math.pow(vals.outerDiameter, 2) - Math.pow(vals.spoolDiameter, 2)) *
+          Math.PI *
+          vals.spoolWidth *
+          0.8) /
+        4 /
+        Math.pow(vals.filamentDiameter, 2) /
+        1e3;
+      const remainingVolume =
+        Math.PI * Math.pow(vals.filamentDiameter / 2, 2) * remainingLength;
+      const remainingMass = materialDensity * remainingVolume;
+
+      return [
+        {
+          label: 'Length',
+          content: `${remainingLength.toFixed(2)} m`
+        },
+        {
+          label: 'Volume',
+          content: (
+            <span>
+              {remainingVolume.toFixed(2)} cm<sup>3</sup>
+            </span>
+          )
+        },
+        {
+          label: 'Mass',
+          content: `${remainingMass.toFixed(2)} g`
+        }
+      ];
+    }, [])
   });
-
-  const showResults = Boolean(
-    (values.material || values.customMaterialDensity) &&
-      values.outerDiameter > 0 &&
-      values.spoolDiameter > 0 &&
-      values.spoolWidth > 0
-  );
-  const showWarning =
-    !showResults &&
-    values.outerDiameter > 0 &&
-    values.spoolDiameter > 0 &&
-    values.spoolWidth > 0 &&
-    !touched.material;
-
-  let remainingLength = 0,
-    remainingVolume = 0,
-    remainingMass = 0;
-
-  if (showResults) {
-    const materialDensity =
-      values.material !== 'custom'
-        ? getMaterial(values.material).density
-        : parseFloat(values.customMaterialDensity);
-
-    remainingLength =
-      ((Math.pow(values.outerDiameter, 2) - Math.pow(values.spoolDiameter, 2)) *
-        Math.PI *
-        values.spoolWidth *
-        0.8) /
-      4 /
-      Math.pow(values.filamentDiameter, 2) /
-      1e3;
-    remainingVolume =
-      Math.PI * Math.pow(values.filamentDiameter / 2, 2) * remainingLength;
-    remainingMass = materialDensity * remainingVolume;
-  }
 
   return (
     <Fragment>
@@ -67,7 +108,7 @@ export default function SpoolDimensions() {
               onChange={handleChange}
               value={values.material}
             >
-              <option>Select One</option>
+              <option value="">Select One</option>
               {materials.map((material) => (
                 <option key={material.name} value={material.name}>
                   {material.name}
@@ -94,6 +135,7 @@ export default function SpoolDimensions() {
           <Form.Control
             min="0"
             name="filamentDiameter"
+            onBlur={handleBlur}
             onChange={handleChange}
             type="number"
             value={values.filamentDiameter}
@@ -104,6 +146,7 @@ export default function SpoolDimensions() {
           <Form.Control
             min="0"
             name="outerDiameter"
+            onBlur={handleBlur}
             onChange={handleChange}
             type="number"
             value={values.outerDiameter}
@@ -114,6 +157,7 @@ export default function SpoolDimensions() {
           <Form.Control
             min="0"
             name="spoolDiameter"
+            onBlur={handleBlur}
             onChange={handleChange}
             type="number"
             value={values.spoolDiameter}
@@ -124,39 +168,16 @@ export default function SpoolDimensions() {
           <Form.Control
             min="0"
             name="spoolWidth"
+            onBlur={handleBlur}
             onChange={handleChange}
             type="number"
             value={values.spoolWidth}
           />
         </Form.Group>
       </Form>
-      {showWarning && (
-        <Alert className="my-4" variant="warning">
-          Select a material.
-        </Alert>
-      )}
-      {showResults && (
-        <ResultsCard
-          results={[
-            {
-              label: 'Length',
-              content: `${remainingLength.toFixed(2)} m`
-            },
-            {
-              label: 'Volume',
-              content: (
-                <span>
-                  {remainingVolume.toFixed(2)} cm<sup>3</sup>
-                </span>
-              )
-            },
-            {
-              label: 'Mass',
-              content: `${remainingMass.toFixed(2)} g`
-            }
-          ]}
-          title="Remaining Filament"
-        />
+      <FormErrors errors={errors} />
+      {Boolean(results) && (
+        <ResultsCard results={results} title="Remaining Filament" />
       )}
     </Fragment>
   );

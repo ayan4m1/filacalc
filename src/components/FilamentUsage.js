@@ -31,12 +31,15 @@ export default function FilamentUsage() {
   } = useCalculatorForm({
     initialValues,
     shouldShow: useCallback(
-      (vals, touch) =>
-        touch.material || vals.material || touch.length || vals.length > 0,
+      (vals, touched) => touched.material || vals.material || touched.length,
       []
     ),
     validate: useCallback((vals) => {
       const result = [];
+
+      if (!vals.material) {
+        result.push('Select a material.');
+      }
 
       if (vals.length <= 0) {
         result.push('Extrusion length must be greater than zero.');
@@ -44,10 +47,6 @@ export default function FilamentUsage() {
 
       if (vals.diameter <= 0) {
         result.push('Filament diameter must be greater than zero.');
-      }
-
-      if (!vals.material) {
-        result.push('Select a material.');
       }
 
       return result;
@@ -153,7 +152,7 @@ export default function FilamentUsage() {
             onChange={handleChange}
             value={values.material}
           >
-            <option>Select One</option>
+            <option value="">Select One</option>
             {materials.map((material) => (
               <option key={material.name} value={material.name}>
                 {material.name}
