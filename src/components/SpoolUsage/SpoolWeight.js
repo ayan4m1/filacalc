@@ -16,7 +16,9 @@ export default function SpoolWeight() {
     customMaterialDensity: 0
   };
 
-  const { values, touched, handleChange } = useFormik({ initialValues });
+  const { values, touched, handleChange, handleBlur } = useFormik({
+    initialValues
+  });
 
   const showResults = Boolean(
     (values.brand || values.customSpoolMass) &&
@@ -72,6 +74,7 @@ export default function SpoolWeight() {
           <Form.Label>Brand</Form.Label>
           <Form.Select
             name="brand"
+            onBlur={handleBlur}
             onChange={handleChange}
             value={values.brand}
           >
@@ -99,6 +102,7 @@ export default function SpoolWeight() {
           <Form.Label>Material</Form.Label>
           <Form.Select
             name="material"
+            onBlur={handleBlur}
             onChange={handleChange}
             value={values.material}
           >

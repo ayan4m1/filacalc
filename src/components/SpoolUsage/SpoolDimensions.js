@@ -15,7 +15,9 @@ export default function SpoolDimensions() {
     spoolWidth: 0
   };
 
-  const { values, touched, handleChange } = useFormik({ initialValues });
+  const { values, touched, handleChange, handleBlur } = useFormik({
+    initialValues
+  });
 
   const showResults = Boolean(
     (values.material || values.customMaterialDensity) &&
@@ -61,6 +63,7 @@ export default function SpoolDimensions() {
             <Form.Label>Material</Form.Label>
             <Form.Select
               name="material"
+              onBlur={handleBlur}
               onChange={handleChange}
               value={values.material}
             >
