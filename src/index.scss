@@ -6,4 +6,10 @@
 // Fix progress bar always having primary color text labels
 .progress > .progress-bar {
   color: unset;
+  min-width: 30px;
+}
+
+.modal-90w {
+  /* stylelint-disable-next-line declaration-no-important */
+  max-width: 90% !important;
 }
