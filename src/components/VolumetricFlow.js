@@ -1,4 +1,5 @@
 import { useFormik } from 'formik';
+import { useSettingsContext } from 'hooks/useSettingsContext';
 import { Fragment, useCallback } from 'react';
 import { Button, Form, Dropdown } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -6,13 +7,12 @@ import { Helmet } from 'react-helmet';
 import { getHotend, getNozzle, hotends, nozzles } from 'utils';
 
 export default function VolumetricFlow() {
-  // const [nozzleVolume, setNozzleVolume] = useState(0);
-  // const [meltZoneVolume, setMeltZoneVolume] = useState(0);
+  const { filamentDiameter } = useSettingsContext();
   const initialValues = {
     nozzle: null,
     hotend: null,
     nozzleDiameter: 0.4,
-    filamentDiameter: 1.75,
+    filamentDiameter,
     customNozzleDiameter: 0,
     customNozzleLength: 0,
     customMeltZoneDiameter: 0,

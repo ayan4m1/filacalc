@@ -4,13 +4,15 @@ import { Form } from 'react-bootstrap';
 import FormErrors from 'components/FormErrors';
 import ResultsCard from 'components/ResultsCard';
 import useCalculatorForm from 'hooks/useCalculatorForm';
+import { useSettingsContext } from 'hooks/useSettingsContext';
 import { materials, getMaterial } from 'utils';
 
 export default function SpoolDimensions() {
+  const { filamentDiameter } = useSettingsContext();
   const initialValues = {
     material: '',
     customMaterialDensity: 0,
-    filamentDiameter: 1.75,
+    filamentDiameter,
     outerDiameter: 0,
     spoolDiameter: 0,
     spoolWidth: 0

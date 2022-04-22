@@ -3,7 +3,8 @@ import {
   faRulerHorizontal,
   faWeightHanging,
   faWeightScale,
-  faHeart
+  faHeart,
+  faDatabase
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Navbar, Nav, Container } from 'react-bootstrap';
@@ -39,6 +40,9 @@ export default function Header() {
             </Nav.Link>
             <Nav.Link as={Link} to="/z-axis">
               <FontAwesomeIcon icon={faGripLines} /> Z-Axis Calibration
+            </Nav.Link>
+            <Nav.Link as={Link} to="/spools">
+              <FontAwesomeIcon icon={faDatabase} /> Spool Database
             </Nav.Link>
           </Nav>
           <Nav className="ms-auto">

@@ -22,6 +22,9 @@ const VolumetricFlow = lazy(() =>
 const ZAxisCalibration = lazy(() =>
   import(/* webpackChunkName: "zaxis" */ 'components/ZAxisCalibration')
 );
+const SpoolDatabase = lazy(() =>
+  import(/* webpackChunkName: "spools" */ 'components/SpoolDatabase')
+);
 
 export default function App() {
   return (
@@ -34,6 +37,7 @@ export default function App() {
           <Route element={<ExtruderCalibration />} path="/extruder" />
           <Route element={<VolumetricFlow />} path="/flow" />
           <Route element={<ZAxisCalibration />} path="/z-axis" />
+          <Route element={<SpoolDatabase />} path="/spools" />
         </Route>
       </Routes>
     </Suspense>
