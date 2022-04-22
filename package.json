@@ -21,10 +21,13 @@
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-bootstrap": "^2.2.3",
+    "react-color": "^2.19.3",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^6.3.0",
-    "reselect": "^4.1.5"
+    "reselect": "^4.1.5",
+    "use-local-storage-state": "^17.0.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
