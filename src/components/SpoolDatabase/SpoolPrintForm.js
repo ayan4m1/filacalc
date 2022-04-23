@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useCallback, useState } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
+import { getMaterial } from 'utils';
 
 export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
   const [filamentLength, setFilamentLength] = useState(0);
@@ -9,6 +10,15 @@ export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
     () => onSubmit(filamentLength),
     [onSubmit, filamentLength]
   );
+
+  if (!spool) {
+    return null;
+  }
+
+  const remainingWeight = spool.currentWeight - spool.spoolWeight;
+  const remainingVolume = remainingWeight / getMaterial(spool.material).density;
+  const remainingLength =
+    remainingVolume / Math.PI / Math.pow(spool.filamentDiameter / 2, 2);
 
   return (
     <Modal onHide={onHide} show={show}>
@@ -20,6 +30,7 @@ export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
           <Form.Group>
             <Form.Label>Filament Length (m)</Form.Label>
             <Form.Control
+              max={remainingLength}
               min="0"
               onChange={(event) =>
                 setFilamentLength(parseFloat(event.target.value))

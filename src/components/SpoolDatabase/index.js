@@ -14,7 +14,7 @@ import { getContrastingColor } from 'react-color/lib/helpers/color';
 
 import { useFormik } from 'formik';
 import fileDownload from 'js-file-download';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { forwardRef, Fragment, useCallback, useEffect, useState } from 'react';
 import {
   Badge,
   Button,
@@ -33,6 +33,12 @@ import { useSettingsContext } from 'hooks/useSettingsContext';
 import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
 import { getMaterial } from 'utils';
 import SpoolPrintForm from './SpoolPrintForm';
+
+const Icon = forwardRef((props, ref) => (
+  <FontAwesomeIcon forwardedRef={ref} {...props} />
+));
+
+Icon.displayName = 'Icon';
 
 export default function SpoolDatabase() {
   const initialValues = {
@@ -110,13 +116,33 @@ export default function SpoolDatabase() {
 
     setShowPrintForm(true);
   }, [selectedId, setShowPrintForm]);
+  const handlePrintSubmit = useCallback(
+    (filamentLength) => {
+      if (!selectedId) {
+        return;
+      }
+
+      const spool = findSpool(selectedId);
+      const consumedVolume =
+        Math.PI * Math.pow(spool.filamentDiameter / 2, 2) * filamentLength;
+      const consumedWeight =
+        consumedVolume * getMaterial(spool.material).density;
+      const remainingWeight = spool.currentWeight - consumedWeight;
+
+      updateSpool({
+        ...spool,
+        currentWeight: remainingWeight
+      });
+      setShowPrintForm(false);
+    },
+    [findSpool, updateSpool, selectedId]
+  );
   const handleImport = useCallback(() => {}, []);
   const handleExport = useCallback(
     () =>
       fileDownload(
         JSON.stringify(spools),
-        `filacalc-export-${format(Date.now(), 'yyyy-MM-dd')}.json`,
-        'octet/stream'
+        `filacalc-export-${format(Date.now(), 'yyyy-MM-dd')}.json`
       ),
     [spools]
   );
@@ -151,6 +177,7 @@ export default function SpoolDatabase() {
       <SpoolEditForm form={form} onHide={hideForm} show={showEditForm} />
       <SpoolPrintForm
         onHide={hidePrintForm}
+        onSubmit={handlePrintSubmit}
         show={showPrintForm}
         spool={findSpool(selectedId)}
       />
@@ -164,8 +191,9 @@ export default function SpoolDatabase() {
                   Spool data is saved to your browser&apos;s local storage.
                 </Tooltip>
               }
+              placement="right"
             >
-              <FontAwesomeIcon icon={faQuestionCircle} />
+              <Icon icon={faQuestionCircle} />
             </OverlayTrigger>
           </div>
         </Col>
@@ -272,7 +300,7 @@ export default function SpoolDatabase() {
                     now={(remainingWeight / spool.netWeight) * 1e2}
                   />
                 </td>
-                <td className="text-end">{remainingWeight} g</td>
+                <td className="text-end">{remainingWeight.toFixed(2)} g</td>
                 <td className="text-end">{remainingLength.toFixed(2)} m</td>
               </tr>
             );
