@@ -14,7 +14,14 @@ import { getContrastingColor } from 'react-color/lib/helpers/color';
 
 import { useFormik } from 'formik';
 import fileDownload from 'js-file-download';
-import { forwardRef, Fragment, useCallback, useEffect, useState } from 'react';
+import {
+  forwardRef,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import {
   Badge,
   Button,
@@ -51,12 +58,13 @@ export default function SpoolDatabase() {
     filamentDiameter: 1.75,
     purchaseDate: formatISO(new Date())
   };
+  const importRef = useRef();
   const [selectedId, setSelectedId] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showPrintForm, setShowPrintForm] = useState(false);
   const [totalWeight, setTotalWeight] = useState(0);
   const [totalRemaining, setTotalRemaining] = useState(0);
-  const { spools, findSpool, addSpool, updateSpool, removeSpool } =
+  const { spools, findSpool, addSpool, updateSpool, removeSpool, setSpools } =
     useSettingsContext();
 
   const form = useFormik({
@@ -137,7 +145,35 @@ export default function SpoolDatabase() {
     },
     [findSpool, updateSpool, selectedId]
   );
-  const handleImport = useCallback(() => {}, []);
+  const handleImport = useCallback(() => {
+    if (importRef.current) {
+      importRef.current.click();
+    }
+  }, [importRef]);
+  const handleImportSubmit = useCallback(
+    (event) => {
+      const {
+        target: {
+          files: [file]
+        }
+      } = event;
+      const reader = new FileReader();
+
+      reader.onloadend = (loaded) => {
+        const {
+          target: { result }
+        } = loaded;
+        const parsed = JSON.parse(result);
+
+        if (parsed) {
+          setSelectedId(null);
+          setSpools(parsed);
+        }
+      };
+      reader.readAsText(file);
+    },
+    [setSelectedId, setSpools]
+  );
   const handleExport = useCallback(
     () =>
       fileDownload(
@@ -198,6 +234,12 @@ export default function SpoolDatabase() {
           </div>
         </Col>
         <Col className="d-flex justify-content-end align-items-end" md={3}>
+          <input
+            className="d-none"
+            onChange={handleImportSubmit}
+            ref={importRef}
+            type="file"
+          />
           <ButtonGroup>
             <Button onClick={handleImport}>
               <FontAwesomeIcon icon={faUpload} /> Import

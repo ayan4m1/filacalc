@@ -56,7 +56,8 @@ export default function SettingsProvider({ children }) {
         findSpool,
         addSpool,
         updateSpool,
-        removeSpool
+        removeSpool,
+        setSpools
       }}
     >
       {children}
