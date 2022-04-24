@@ -38,6 +38,10 @@ export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
               type="number"
               value={filamentLength}
             />
+            <Form.Text className="text-primary">
+              Your spool has {remainingLength.toFixed(2)} meters of filament
+              remaining.
+            </Form.Text>
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
