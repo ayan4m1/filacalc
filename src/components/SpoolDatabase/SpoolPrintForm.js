@@ -1,24 +1,82 @@
+import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
-import { useCallback, useState } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
-import { getMaterial } from 'utils';
+import { useCallback } from 'react';
+import {
+  Button,
+  Modal,
+  Form,
+  Container,
+  Row,
+  Col,
+  Spinner,
+  ProgressBar
+} from 'react-bootstrap';
+
+import useParser from 'hooks/useParser';
+import { getRemainingFilament } from 'utils';
 
 export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
-  const [filamentLength, setFilamentLength] = useState(0);
+  const initialValues = {
+    filamentLength: 0
+  };
+  const { errors, values, handleChange, handleSubmit, setFieldValue } =
+    useFormik({
+      initialValues,
+      validate: (vals) => {
+        const result = {};
 
-  const handleSubmit = useCallback(
-    () => onSubmit(filamentLength),
-    [onSubmit, filamentLength]
+        const { length: remainingLength } = getRemainingFilament(spool);
+
+        if (vals.filamentLength <= 0) {
+          result.filamentLength = 'Filament length must be greater than zero.';
+        } else if (vals.filamentLength > remainingLength) {
+          result.filamentLength = `Filament length must be less than ${remainingLength.toFixed(
+            2
+          )} meters.`;
+        }
+
+        return result;
+      },
+      onSubmit: useCallback(
+        (vals) => {
+          onSubmit(vals.filamentLength);
+        },
+        [onSubmit]
+      )
+    });
+
+  const {
+    loading,
+    error: parserError,
+    progress,
+    handleChange: handleFileChange
+  } = useParser((data) =>
+    setFieldValue('filamentLength', data.length.toFixed(2))
   );
 
   if (!spool) {
     return null;
   }
 
-  const remainingWeight = spool.currentWeight - spool.spoolWeight;
-  const remainingVolume = remainingWeight / getMaterial(spool.material).density;
-  const remainingLength =
-    remainingVolume / Math.PI / Math.pow(spool.filamentDiameter / 2, 2);
+  if (loading) {
+    return (
+      <Modal onHide={onHide} show={show}>
+        <Modal.Header>
+          <Modal.Title>Parsing your G-code...</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Container>
+            <Row>
+              <Col className="text-center mb-4">
+                <Spinner animation="border" className="my-3" />
+                <ProgressBar animated now={progress} variant="primary" />
+              </Col>
+            </Row>
+          </Container>
+        </Modal.Body>
+      </Modal>
+    );
+  }
 
   return (
     <Modal onHide={onHide} show={show}>
@@ -28,20 +86,32 @@ export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
         </Modal.Header>
         <Modal.Body>
           <Form.Group>
+            <Form.Label>Select a G-code file</Form.Label>
+            <Form.Control
+              isInvalid={parserError}
+              onChange={handleFileChange}
+              type="file"
+            />
+            <Form.Text className="text-muted">
+              Files are parsed in your browser, not sent to a server.
+            </Form.Text>
+            <Form.Control.Feedback type="invalid">
+              Unable to parse the selected file.
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group>
             <Form.Label>Filament Length (m)</Form.Label>
             <Form.Control
-              max={remainingLength}
+              isInvalid={Boolean(errors.filamentLength)}
               min="0"
-              onChange={(event) =>
-                setFilamentLength(parseFloat(event.target.value))
-              }
+              name="filamentLength"
+              onChange={handleChange}
               type="number"
-              value={filamentLength}
+              value={values.filamentLength}
             />
-            <Form.Text className="text-primary">
-              Your spool has {remainingLength.toFixed(2)} meters of filament
-              remaining.
-            </Form.Text>
+            <Form.Control.Feedback type="invalid">
+              {errors.filamentLength}
+            </Form.Control.Feedback>
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>

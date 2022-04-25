@@ -89,6 +89,7 @@ export default function SpoolEditForm({
               min="0"
               name="currentWeight"
               onChange={handleChange}
+              step="0.01"
               type="number"
               value={values.currentWeight}
             />

@@ -38,7 +38,7 @@ import { v4 } from 'uuid';
 
 import { useSettingsContext } from 'hooks/useSettingsContext';
 import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
-import { getMaterial } from 'utils';
+import { getMaterial, getRemainingFilament } from 'utils';
 import SpoolPrintForm from './SpoolPrintForm';
 
 const Icon = forwardRef((props, ref) => (
@@ -135,7 +135,8 @@ export default function SpoolDatabase() {
         Math.PI * Math.pow(spool.filamentDiameter / 2, 2) * filamentLength;
       const consumedWeight =
         consumedVolume * getMaterial(spool.material).density;
-      const remainingWeight = spool.currentWeight - consumedWeight;
+      const remainingWeight =
+        Math.round((spool.currentWeight - consumedWeight) * 1e2) / 1e2;
 
       updateSpool({
         ...spool,
@@ -224,7 +225,7 @@ export default function SpoolDatabase() {
             <OverlayTrigger
               overlay={
                 <Tooltip>
-                  Spool data is saved to your browser&apos;s local storage.
+                  All data is saved to your browser&apos;s local storage.
                 </Tooltip>
               }
               placement="right"
@@ -302,13 +303,8 @@ export default function SpoolDatabase() {
             </tr>
           )}
           {spools.map((spool) => {
-            const remainingWeight = spool.currentWeight - spool.spoolWeight;
-            const remainingVolume =
-              remainingWeight / getMaterial(spool.material).density;
-            const remainingLength =
-              remainingVolume /
-              Math.PI /
-              Math.pow(spool.filamentDiameter / 2, 2);
+            const { mass: remainingMass, length: remainingLength } =
+              getRemainingFilament(spool);
 
             return (
               <tr
@@ -337,12 +333,12 @@ export default function SpoolDatabase() {
                   <ProgressBar
                     className="text-light"
                     label={`${Math.floor(
-                      (remainingWeight / spool.netWeight) * 1e2
+                      (remainingMass / spool.netWeight) * 1e2
                     )}%`}
-                    now={(remainingWeight / spool.netWeight) * 1e2}
+                    now={(remainingMass / spool.netWeight) * 1e2}
                   />
                 </td>
-                <td className="text-end">{remainingWeight.toFixed(2)} g</td>
+                <td className="text-end">{remainingMass.toFixed(2)} g</td>
                 <td className="text-end">{remainingLength.toFixed(2)} m</td>
               </tr>
             );
