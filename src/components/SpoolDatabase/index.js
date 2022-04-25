@@ -38,8 +38,8 @@ import { v4 } from 'uuid';
 
 import { useSettingsContext } from 'hooks/useSettingsContext';
 import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
-import { getMaterial, getRemainingFilament } from 'utils';
-import SpoolPrintForm from './SpoolPrintForm';
+import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
+import { getRemainingFilament } from 'utils';
 
 const Icon = forwardRef((props, ref) => (
   <FontAwesomeIcon forwardedRef={ref} {...props} />
@@ -51,6 +51,7 @@ export default function SpoolDatabase() {
   const initialValues = {
     name: 'Spool',
     material: 'PLA',
+    materialDensity: 1.24,
     color: '#000000',
     netWeight: 1000,
     spoolWeight: 250,
@@ -126,18 +127,14 @@ export default function SpoolDatabase() {
     setShowPrintForm(true);
   }, [selectedId, setShowPrintForm]);
   const handlePrintSubmit = useCallback(
-    (filamentLength) => {
+    (filamentWeight) => {
       if (!selectedId) {
         return;
       }
 
       const spool = findSpool(selectedId);
-      const consumedVolume =
-        Math.PI * Math.pow(spool.filamentDiameter / 2, 2) * filamentLength;
-      const consumedWeight =
-        consumedVolume * getMaterial(spool.material).density;
       const remainingWeight =
-        Math.round((spool.currentWeight - consumedWeight) * 1e2) / 1e2;
+        Math.round((spool.currentWeight - filamentWeight) * 1e2) / 1e2;
 
       updateSpool({
         ...spool,

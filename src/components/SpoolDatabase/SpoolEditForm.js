@@ -46,8 +46,22 @@ export default function SpoolEditForm({
                   {material.name}
                 </option>
               ))}
+              <option value="custom">Custom</option>
             </Form.Select>
           </Form.Group>
+          {values.material === 'custom' && (
+            <Form.Group>
+              <Form.Label>
+                Material Density (g/cm<sup>3</sup>)
+              </Form.Label>
+              <Form.Control
+                name="materialDensity"
+                onChange={handleChange}
+                type="number"
+                value={values.materialDensity}
+              />
+            </Form.Group>
+          )}
           <Form.Group>
             <Form.Label>Color</Form.Label>
             <Form.Control

@@ -2,7 +2,7 @@ import { Fragment, useCallback } from 'react';
 import { Form, ProgressBar } from 'react-bootstrap';
 
 import ResultsCard from 'components/ResultsCard';
-import { getMaterial, getSpool, materials, spools } from 'utils';
+import { getRemainingFilament, getSpool, materials, spools } from 'utils';
 import useCalculatorForm from 'hooks/useCalculatorForm';
 import FormErrors from 'components/FormErrors';
 
@@ -10,11 +10,11 @@ export default function SpoolWeight() {
   const initialValues = {
     brand: '',
     material: '',
-    diameter: 1.75,
+    filamentDiameter: 1.75,
     netWeight: 1000,
     currentWeight: 0,
-    customSpoolMass: 0,
-    customMaterialDensity: 0
+    spoolWeight: 0,
+    materialDensity: 0
   };
 
   const {
@@ -60,20 +60,16 @@ export default function SpoolWeight() {
       return result;
     }, []),
     calculate: useCallback((vals) => {
-      const spoolMass =
-        vals.brand && vals.brand !== 'custom'
-          ? getSpool(vals.brand).mass
-          : parseFloat(vals.customSpoolMass);
-      const materialDensity =
-        vals.material && vals.material !== 'custom'
-          ? getMaterial(vals.material).density
-          : parseFloat(vals.customMaterialDensity);
+      if (vals.brand !== 'custom') {
+        vals.spoolWeight = getSpool(vals.brand).mass;
+      }
 
-      const remainingMass = vals.currentWeight - spoolMass;
-      const remainingVolume = remainingMass / materialDensity;
-      const remainingLength =
-        remainingVolume / (Math.PI * Math.pow(vals.diameter / 2.0, 2));
-      const remainingPercent = (remainingMass / vals.netWeight) * 1e2;
+      const {
+        mass: remainingMass,
+        volume: remainingVolume,
+        length: remainingLength,
+        percent: remainingPercent
+      } = getRemainingFilament(vals);
 
       let progressVariant = 'success';
 
@@ -181,10 +177,10 @@ export default function SpoolWeight() {
           <Form.Label>Filament Diameter (mm)</Form.Label>
           <Form.Control
             min="0"
-            name="diameter"
+            name="filamentDiameter"
             onChange={handleChange}
             type="number"
-            value={values.diameter}
+            value={values.filamentDiameter}
           />
         </Form.Group>
         <Form.Group>

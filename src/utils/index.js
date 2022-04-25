@@ -72,8 +72,16 @@ export const stepAngles = [1.8, 0.9, 7.5];
 export const leadscrewPitches = [1.25, 1, 12, 16, 25, 1.41111, 1.27, 1.5875];
 
 export const getRemainingFilament = (spool) => {
+  let volume = 0;
+
   const mass = spool.currentWeight - spool.spoolWeight;
-  const volume = mass / getMaterial(spool.material).density;
+
+  if (spool.material !== 'custom') {
+    volume = mass / getMaterial(spool.material).density;
+  } else {
+    volume = mass / spool.materialDensity;
+  }
+
   const length = volume / Math.PI / Math.pow(spool.filamentDiameter / 2, 2);
   const percent = (mass / spool.netWeight) * 1e2;
 

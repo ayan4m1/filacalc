@@ -13,7 +13,7 @@ import {
 } from 'react-bootstrap';
 
 import useParser from 'hooks/useParser';
-import { getRemainingFilament } from 'utils';
+import { getMaterial, getRemainingFilament } from 'utils';
 
 export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
   const initialValues = {
@@ -23,30 +23,47 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
   const { errors, values, handleChange, handleSubmit, setFieldValue } =
     useFormik({
       initialValues,
-      validate: (vals) => {
-        const result = {};
+      validate: useCallback(
+        (vals) => {
+          const result = {};
 
-        if (vals.copies < 1) {
-          result.copies = 'Copies must be greater than zero.';
-        }
+          if (vals.copies < 1) {
+            result.copies = 'Copies must be greater than zero.';
+          }
 
-        const { length: remainingLength } = getRemainingFilament(spool);
+          const { length: remainingLength } = getRemainingFilament(spool);
 
-        if (vals.filamentLength <= 0) {
-          result.filamentLength = 'Filament length must be greater than zero.';
-        } else if (vals.filamentLength > remainingLength) {
-          result.filamentLength = `Filament length must be less than ${remainingLength.toFixed(
-            2
-          )} meters.`;
-        }
+          if (vals.filamentLength <= 0) {
+            result.filamentLength =
+              'Filament length must be greater than zero.';
+          } else if (vals.filamentLength > remainingLength) {
+            result.filamentLength = `Filament length must be less than ${remainingLength.toFixed(
+              2
+            )} meters.`;
+          }
 
-        return result;
-      },
+          return result;
+        },
+        [spool]
+      ),
       onSubmit: useCallback(
         (vals) => {
-          onSubmit(vals.filamentLength * vals.copies);
+          let consumedWeight = 0;
+
+          const consumedLength = vals.filamentLength * vals.copies;
+          const consumedVolume =
+            Math.PI * Math.pow(spool.filamentDiameter / 2, 2) * consumedLength;
+
+          if (spool.material !== 'custom') {
+            consumedWeight =
+              consumedVolume * getMaterial(spool.material).density;
+          } else {
+            consumedWeight = consumedVolume * spool.materialDensity;
+          }
+
+          onSubmit(consumedWeight);
         },
-        [onSubmit]
+        [onSubmit, spool]
       )
     });
 
