@@ -84,12 +84,13 @@ export default function SpoolDatabase() {
       setShowEditForm(false);
     }
   });
-  const { setFieldValue } = form;
+  const { handleReset, setFieldValue } = form;
 
   const handleAdd = useCallback(() => {
+    handleReset();
     setShowEditForm(true);
     setSelectedId(null);
-  }, [setShowEditForm, setSelectedId]);
+  }, [setShowEditForm, setSelectedId, handleReset]);
   const handleEdit = useCallback(() => {
     if (!selectedId) {
       return;
@@ -211,13 +212,16 @@ export default function SpoolDatabase() {
   return (
     <Fragment>
       <Helmet title="Spool Database" />
-      <SpoolEditForm form={form} onHide={hideForm} show={showEditForm} />
-      <SpoolPrintForm
-        onHide={hidePrintForm}
-        onSubmit={handlePrintSubmit}
-        show={showPrintForm}
-        spool={findSpool(selectedId)}
-      />
+      {showEditForm && (
+        <SpoolEditForm form={form} onHide={hideForm} show={showEditForm} />
+      )}
+      {selectedId && showPrintForm && (
+        <SpoolPrintForm
+          onHide={hidePrintForm}
+          onSubmit={handlePrintSubmit}
+          spool={findSpool(selectedId)}
+        />
+      )}
       <Row className="mb-2">
         <Col md={9}>
           <div className="d-flex align-items-center">

@@ -15,7 +15,7 @@ import {
 import useParser from 'hooks/useParser';
 import { getRemainingFilament } from 'utils';
 
-export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
+export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
   const initialValues = {
     filamentLength: 0
   };
@@ -54,13 +54,9 @@ export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
     setFieldValue('filamentLength', data.length.toFixed(2))
   );
 
-  if (!spool) {
-    return null;
-  }
-
   if (loading) {
     return (
-      <Modal onHide={onHide} show={show}>
+      <Modal onHide={onHide} show={true}>
         <Modal.Header>
           <Modal.Title>Parsing your G-code...</Modal.Title>
         </Modal.Header>
@@ -79,7 +75,7 @@ export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
   }
 
   return (
-    <Modal onHide={onHide} show={show}>
+    <Modal onHide={onHide} show={true}>
       <Form>
         <Modal.Header closeButton>
           <Modal.Title>Print from {spool?.name}</Modal.Title>
@@ -129,7 +125,6 @@ export default function SpoolPrintForm({ spool, onHide, show, onSubmit }) {
 
 SpoolPrintForm.propTypes = {
   onHide: PropTypes.func.isRequired,
-  show: PropTypes.bool,
-  onSubmit: PropTypes.func,
-  spool: PropTypes.object
+  onSubmit: PropTypes.func.isRequired,
+  spool: PropTypes.object.isRequired
 };

@@ -9,8 +9,7 @@ import { materials } from 'utils';
 
 export default function SpoolEditForm({
   form: { values, handleChange, handleSubmit, setFieldValue },
-  onHide,
-  show
+  onHide
 }) {
   const handleColorChange = useCallback(
     (color) => {
@@ -20,7 +19,7 @@ export default function SpoolEditForm({
   );
 
   return (
-    <Modal dialogClassName="modal-90w" onHide={onHide} show={show}>
+    <Modal dialogClassName="modal-90w" onHide={onHide} show={true}>
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
           <Modal.Title>{values ? 'Edit' : 'Create'} a Spool</Modal.Title>
@@ -143,6 +142,5 @@ SpoolEditForm.propTypes = {
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired
   }).isRequired,
-  onHide: PropTypes.func.isRequired,
-  show: PropTypes.bool
+  onHide: PropTypes.func.isRequired
 };
