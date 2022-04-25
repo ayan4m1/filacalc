@@ -90,13 +90,8 @@ export default function FilamentUsage() {
     loading,
     error: parserError,
     progress,
-    parse
+    handleChange: handleFileChange
   } = useParser((data) => setFieldValue('length', data.length.toFixed(2)));
-
-  const changeFile = useCallback(
-    (event) => parse(event.target.files[0]),
-    [parse]
-  );
 
   if (loading) {
     return (
@@ -134,7 +129,7 @@ export default function FilamentUsage() {
           <Form.Label>Select a G-code file</Form.Label>
           <Form.Control
             isInvalid={parserError}
-            onChange={changeFile}
+            onChange={handleFileChange}
             type="file"
           />
           <Form.Text className="text-muted">

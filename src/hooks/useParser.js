@@ -31,8 +31,14 @@ export default function useParser(handler) {
     [handler, setProgress, setLoading, setError]
   );
 
-  const parse = useCallback(
-    (file) => {
+  const handleChange = useCallback(
+    (event) => {
+      const {
+        target: {
+          files: [file]
+        }
+      } = event;
+
       if (!file || !file.name.endsWith('.gcode')) {
         setError(true);
         setLoading(false);
@@ -58,6 +64,6 @@ export default function useParser(handler) {
     loading,
     error,
     progress,
-    parse
+    handleChange
   };
 }
