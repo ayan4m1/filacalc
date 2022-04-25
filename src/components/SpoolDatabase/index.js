@@ -299,7 +299,7 @@ export default function SpoolDatabase() {
         <tbody>
           {!spools?.length && (
             <tr>
-              <td colSpan={5}>No spools.</td>
+              <td colSpan={7}>No spools.</td>
             </tr>
           )}
           {spools.map((spool) => {
