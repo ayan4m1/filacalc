@@ -17,13 +17,18 @@ import { getRemainingFilament } from 'utils';
 
 export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
   const initialValues = {
-    filamentLength: 0
+    filamentLength: 0,
+    copies: 1
   };
   const { errors, values, handleChange, handleSubmit, setFieldValue } =
     useFormik({
       initialValues,
       validate: (vals) => {
         const result = {};
+
+        if (vals.copies < 1) {
+          result.copies = 'Copies must be greater than zero.';
+        }
 
         const { length: remainingLength } = getRemainingFilament(spool);
 
@@ -39,7 +44,7 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
       },
       onSubmit: useCallback(
         (vals) => {
-          onSubmit(vals.filamentLength);
+          onSubmit(vals.filamentLength * vals.copies);
         },
         [onSubmit]
       )
@@ -104,6 +109,20 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
               onChange={handleChange}
               type="number"
               value={values.filamentLength}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.filamentLength}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Number of Copies</Form.Label>
+            <Form.Control
+              isInvalid={Boolean(errors.copies)}
+              min="1"
+              name="copies"
+              onChange={handleChange}
+              type="number"
+              value={values.copies}
             />
             <Form.Control.Feedback type="invalid">
               {errors.filamentLength}
