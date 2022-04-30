@@ -11,10 +11,12 @@ export default function SpoolEditForm({
   form: { values, handleChange, handleSubmit, setFieldValue },
   onHide
 }) {
+  const handleDateChange = useCallback(
+    (date) => setFieldValue('purchaseDate', formatISO(date)),
+    [setFieldValue]
+  );
   const handleColorChange = useCallback(
-    (color) => {
-      setFieldValue('color', color.hex);
-    },
+    (color) => setFieldValue('color', color.hex),
     [setFieldValue]
   );
 
@@ -129,9 +131,7 @@ export default function SpoolEditForm({
             <Form.Label>Purchase Date</Form.Label>
             <Form.Control
               as={DatePicker}
-              onChange={(date) =>
-                setFieldValue('purchaseDate', formatISO(date))
-              }
+              onChange={handleDateChange}
               selected={parseISO(values.purchaseDate)}
             />
           </Form.Group>
