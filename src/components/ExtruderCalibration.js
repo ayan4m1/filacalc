@@ -144,7 +144,7 @@ export default function ExtruderCalibration() {
       <ResultsCard title="Result">
         <p>
           The corrected value is{' '}
-          <strong>{results.stepsPerMm.toFixed(2)} steps/mm.</strong>
+          <strong>{results?.stepsPerMm.toFixed(2)} steps/mm.</strong>
         </p>
       </ResultsCard>
     </Fragment>
