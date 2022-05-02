@@ -8,10 +8,6 @@ export default function SettingsProvider({ children }) {
   const [spools, setSpools] = useLocalStorageState('spools', {
     defaultValue: []
   });
-  const [filamentDiameter, setFilamentDiameter] = useLocalStorageState(
-    'filamentDiameter',
-    { defaultValue: 1.75 }
-  );
 
   const findSpool = useCallback(
     (id) => spools.find((spool) => spool.id === id),
@@ -50,8 +46,6 @@ export default function SettingsProvider({ children }) {
   return (
     <SettingsContext.Provider
       value={{
-        filamentDiameter,
-        setFilamentDiameter,
         spools,
         findSpool,
         addSpool,
