@@ -10,8 +10,6 @@ import {
   faUpload
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getContrastingColor } from 'react-color/lib/helpers/color';
-
 import { useFormik } from 'formik';
 import fileDownload from 'js-file-download';
 import {
@@ -22,6 +20,7 @@ import {
   useRef,
   useState
 } from 'react';
+import { getContrastingColor } from 'react-color/lib/helpers/color';
 import {
   Badge,
   Button,
@@ -35,17 +34,45 @@ import {
 } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { v4 } from 'uuid';
+import * as Yup from 'yup';
 
 import { useSettingsContext } from 'hooks/useSettingsContext';
 import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
 import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
 import { getRemainingFilament } from 'utils';
 
+/* Needed because we use this with an OverlayTrigger */
 const Icon = forwardRef((props, ref) => (
   <FontAwesomeIcon forwardedRef={ref} {...props} />
 ));
 
 Icon.displayName = 'Icon';
+
+const SpoolSchema = Yup.object({
+  name: Yup.string().required('Name must be provided.'),
+  material: Yup.string().required('Material must be provided.'),
+  materialDensity: Yup.number().moreThan(
+    0,
+    'Density must be greater than zero.'
+  ),
+  color: Yup.string()
+    .required('Color must be provided.')
+    .matches(/#[a-fA-F0-9]+/, 'Color is invalid.'),
+  netWeight: Yup.number()
+    .required('Net weight must be provided.')
+    .moreThan(0, 'Net weight must be greater than zero.'),
+  spoolWeight: Yup.number()
+    .required('Spool weight must be provided.')
+    .moreThan(0, 'Spool weight must be greater than zero.'),
+  currentWeight: Yup.number()
+    .required('Current weight must be provided.')
+    .moreThan(0, 'Current weight must be greater than zero.'),
+  filamentDiameter: Yup.number()
+    .required('Filament diameter must be provided.')
+    .moreThan(0, 'Filament diameter must be greater than zero.'),
+  purchaseDate: Yup.string().required('Purchase date must be provided.'),
+  purchaseCost: Yup.number().required('Purchase cost must be provided.')
+});
 
 export default function SpoolDatabase() {
   const initialValues = {
@@ -57,7 +84,8 @@ export default function SpoolDatabase() {
     spoolWeight: 250,
     currentWeight: 1250,
     filamentDiameter: 1.75,
-    purchaseDate: formatISO(new Date())
+    purchaseDate: formatISO(new Date()),
+    purchaseCost: 0
   };
   const importRef = useRef();
   const [selectedId, setSelectedId] = useState(null);
@@ -70,6 +98,7 @@ export default function SpoolDatabase() {
 
   const form = useFormik({
     initialValues,
+    validationSchema: SpoolSchema,
     onSubmit: (vals) => {
       if (selectedId) {
         updateSpool({
@@ -164,10 +193,17 @@ export default function SpoolDatabase() {
         } = loaded;
         const parsed = JSON.parse(result);
 
-        if (parsed) {
+        /* eslint-disable no-alert */
+        if (
+          parsed &&
+          alert(
+            'Are you sure you want to overwrite your current spool database?'
+          )
+        ) {
           setSelectedId(null);
           setSpools(parsed);
         }
+        /* eslint-enable no-alert */
       };
       reader.readAsText(file);
     },
@@ -280,7 +316,7 @@ export default function SpoolDatabase() {
       <Table>
         <thead>
           <tr>
-            <th colSpan={4}></th>
+            <th colSpan={5}></th>
             <th className="text-center" colSpan={3}>
               Remaining
             </th>
@@ -290,6 +326,7 @@ export default function SpoolDatabase() {
             <th>Material</th>
             <th className="text-center">Purchased</th>
             <th className="text-end">Net Weight</th>
+            <th className="text-end">Cost / kg</th>
             <th className="text-end" style={{ width: '20%' }}>
               %
             </th>
@@ -306,10 +343,18 @@ export default function SpoolDatabase() {
           {spools.map((spool) => {
             const { mass: remainingMass, length: remainingLength } =
               getRemainingFilament(spool);
+            const rowClasses =
+              selectedId === spool.id ? 'bg-dark text-light' : '';
+            const purchaseDate = format(
+              parseISO(spool.purchaseDate),
+              'yyyy-MM-dd'
+            );
+            const material =
+              spool.material === 'custom' ? 'Custom' : spool.material;
 
             return (
               <tr
-                className={selectedId === spool.id ? 'bg-dark text-light' : ''}
+                className={rowClasses}
                 key={spool.id}
                 onClick={() => toggleSelected(spool.id)}
               >
@@ -324,12 +369,13 @@ export default function SpoolDatabase() {
                     {spool.name}
                   </Badge>
                 </td>
-                <td>{spool.material}</td>
-                <td className="text-center">
-                  {Boolean(spool.purchaseDate) &&
-                    format(parseISO(spool.purchaseDate), 'yyyy-MM-dd')}
-                </td>
+                <td>{material}</td>
+                <td className="text-center">{purchaseDate}</td>
                 <td className="text-end">{spool.netWeight} g</td>
+                <td className="text-end">
+                  {Boolean(spool.purchaseCost) &&
+                    ((spool.purchaseCost / spool.netWeight) * 1e3).toFixed(2)}
+                </td>
                 <td className="text-end">
                   <ProgressBar
                     className="text-light"
@@ -351,7 +397,7 @@ export default function SpoolDatabase() {
             <td className="text-end" colSpan={3}>
               {Math.round(totalWeight)} g
             </td>
-            <td className="text-end" colSpan={2}>
+            <td className="text-end" colSpan={3}>
               {Math.round(totalRemaining)} g
             </td>
             <td></td>

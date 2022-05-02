@@ -8,7 +8,7 @@ import { Form, Modal, Button } from 'react-bootstrap';
 import { materials } from 'utils';
 
 export default function SpoolEditForm({
-  form: { values, handleChange, handleSubmit, setFieldValue },
+  form: { errors, values, handleChange, handleSubmit, setFieldValue },
   onHide
 }) {
   const handleDateChange = useCallback(
@@ -30,15 +30,20 @@ export default function SpoolEditForm({
           <Form.Group>
             <Form.Label>Spool Name</Form.Label>
             <Form.Control
+              isInvalid={Boolean(errors.name)}
               name="name"
               onChange={handleChange}
               type="text"
               value={values.name}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.name}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
             <Form.Label>Filament Material</Form.Label>
             <Form.Select
+              isInvalid={Boolean(errors.material)}
               name="material"
               onChange={handleChange}
               value={values.material}
@@ -50,6 +55,9 @@ export default function SpoolEditForm({
               ))}
               <option value="custom">Custom</option>
             </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {errors.material}
+            </Form.Control.Feedback>
           </Form.Group>
           {values.material === 'custom' && (
             <Form.Group>
@@ -57,21 +65,29 @@ export default function SpoolEditForm({
                 Material Density (g/cm<sup>3</sup>)
               </Form.Label>
               <Form.Control
+                isInvalid={Boolean(errors.materialDensity)}
                 name="materialDensity"
                 onChange={handleChange}
                 type="number"
                 value={values.materialDensity}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.materialDensity}
+              </Form.Control.Feedback>
             </Form.Group>
           )}
           <Form.Group>
             <Form.Label>Color</Form.Label>
             <Form.Control
+              isInvalid={Boolean(errors.color)}
               name="color"
               onChange={handleChange}
               type="text"
               value={values.color}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.color}
+            </Form.Control.Feedback>
             <SketchPicker
               className="my-2"
               color={values.color}
@@ -81,26 +97,35 @@ export default function SpoolEditForm({
           <Form.Group>
             <Form.Label>Net Weight (g)</Form.Label>
             <Form.Control
+              isInvalid={Boolean(errors.netWeight)}
               min="0"
               name="netWeight"
               onChange={handleChange}
               type="number"
               value={values.netWeight}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.netWeight}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
             <Form.Label>Spool Weight (g)</Form.Label>
             <Form.Control
+              isInvalid={Boolean(errors.spoolWeight)}
               min="0"
               name="spoolWeight"
               onChange={handleChange}
               type="number"
               value={values.spoolWeight}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.spoolWeight}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
             <Form.Label>Current Weight (g)</Form.Label>
             <Form.Control
+              isInvalid={Boolean(errors.currentWeight)}
               min="0"
               name="currentWeight"
               onChange={handleChange}
@@ -108,6 +133,9 @@ export default function SpoolEditForm({
               type="number"
               value={values.currentWeight}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.currentWeight}
+            </Form.Control.Feedback>
             <Form.Text className="text-primary">
               {(
                 ((values.currentWeight - values.spoolWeight) /
@@ -120,20 +148,44 @@ export default function SpoolEditForm({
           <Form.Group>
             <Form.Label>Filameter Diameter (mm)</Form.Label>
             <Form.Control
+              isInvalid={Boolean(errors.filamentDiameter)}
               min="0"
               name="filamentDiameter"
               onChange={handleChange}
-              type="text"
+              step="0.01"
+              type="number"
               value={values.filamentDiameter}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.filamentDiameter}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
             <Form.Label>Purchase Date</Form.Label>
             <Form.Control
               as={DatePicker}
+              isInvalid={Boolean(errors.purchaseDate)}
               onChange={handleDateChange}
               selected={parseISO(values.purchaseDate)}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.purchaseDate}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Purchase Cost</Form.Label>
+            <Form.Control
+              isInvalid={Boolean(errors.purchaseCost)}
+              min="0"
+              name="purchaseCost"
+              onChange={handleChange}
+              step="0.01"
+              type="number"
+              value={values.purchaseCost}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.purchaseCost}
+            </Form.Control.Feedback>
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
@@ -151,6 +203,7 @@ export default function SpoolEditForm({
 
 SpoolEditForm.propTypes = {
   form: PropTypes.shape({
+    errors: PropTypes.object.isRequired,
     values: PropTypes.object.isRequired,
     setFieldValue: PropTypes.func.isRequired,
     handleChange: PropTypes.func.isRequired,

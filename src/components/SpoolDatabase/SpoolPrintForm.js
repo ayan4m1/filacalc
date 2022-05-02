@@ -9,11 +9,21 @@ import {
   Row,
   Col,
   Spinner,
-  ProgressBar
+  ProgressBar,
+  Alert
 } from 'react-bootstrap';
+import * as Yup from 'yup';
 
 import useParser from 'hooks/useParser';
 import { getMaterial, getRemainingFilament } from 'utils';
+
+const FormSchema = Yup.object({
+  filamentLength: Yup.number().moreThan(
+    0,
+    'Filament length must be greater than zero.'
+  ),
+  copies: Yup.number().moreThan(0, 'Copies must be greater than zero.')
+});
 
 export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
   const initialValues = {
@@ -23,29 +33,7 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
   const { errors, values, handleChange, handleSubmit, setFieldValue } =
     useFormik({
       initialValues,
-      validate: useCallback(
-        (vals) => {
-          const result = {};
-
-          if (vals.copies < 1) {
-            result.copies = 'Copies must be greater than zero.';
-          }
-
-          const { length: remainingLength } = getRemainingFilament(spool);
-
-          if (vals.filamentLength <= 0) {
-            result.filamentLength =
-              'Filament length must be greater than zero.';
-          } else if (vals.filamentLength > remainingLength) {
-            result.filamentLength = `Filament length must be less than ${remainingLength.toFixed(
-              2
-            )} meters.`;
-          }
-
-          return result;
-        },
-        [spool]
-      ),
+      validationSchema: FormSchema,
       onSubmit: useCallback(
         (vals) => {
           let consumedWeight = 0;
@@ -96,6 +84,21 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
     );
   }
 
+  const consumedFilamentLength = values.filamentLength * values.copies;
+  const materialDensity =
+    spool.material === 'custom'
+      ? spool.materialDensity
+      : getMaterial(spool.material).density;
+  const consumedFilamentVolume =
+    Math.PI * Math.pow(spool.filamentDiameter / 2, 2) * consumedFilamentLength;
+  const consumedFilamentMass = consumedFilamentVolume * materialDensity;
+  const { length: spoolFilamentLength } = getRemainingFilament(spool);
+  const remainingFilamentLength = spoolFilamentLength - consumedFilamentLength;
+  const remainingFilamentPercent =
+    (remainingFilamentLength / spoolFilamentLength) * 1e2;
+  const filamentCost =
+    (consumedFilamentMass / spool.netWeight) * spool.purchaseCost;
+
   return (
     <Modal onHide={onHide} show={true}>
       <Form>
@@ -145,12 +148,33 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
               {errors.filamentLength}
             </Form.Control.Feedback>
           </Form.Group>
+          {remainingFilamentLength > 0 ? (
+            <Alert className="mt-2" variant="info">
+              <p>
+                This print will consume {consumedFilamentLength.toFixed(2)}{' '}
+                meters of filament, leaving this much of the spool:
+              </p>
+              <ProgressBar
+                label={`${Math.round(remainingFilamentPercent)}%`}
+                now={remainingFilamentPercent}
+              />
+              <p>The cost of the filament is {filamentCost.toFixed(2)}.</p>
+            </Alert>
+          ) : (
+            <Alert className="mt-2" variant="danger">
+              The spool does not have enough filament remaining for this print!
+            </Alert>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={onHide} variant="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} variant="primary">
+          <Button
+            disabled={remainingFilamentLength <= 0}
+            onClick={handleSubmit}
+            variant="primary"
+          >
             Print
           </Button>
         </Modal.Footer>
