@@ -200,7 +200,7 @@ export default function FilamentUsage() {
         </Form.Group>
       </Form>
       <FormErrors errors={errors} />
-      {Boolean(results) && <ResultsCard results={results} />}
+      <ResultsCard results={results} />
     </Fragment>
   );
 }

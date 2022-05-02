@@ -198,38 +198,36 @@ export default function ZAxisCalibration() {
         </Form.Group>
       </Form>
       <FormErrors errors={errors} />
-      {Boolean(results) && (
-        <ResultsCard results={results.results}>
-          {!results.evenlyDivisible && (
-            <Table>
-              <thead>
-                <tr>
-                  <th>Layer Height</th>
-                  <th>Number of Steps</th>
-                  <th>Error over {results.printHeight / 10}cm</th>
+      <ResultsCard results={results.results}>
+        {!results.evenlyDivisible && (
+          <Table>
+            <thead>
+              <tr>
+                <th>Layer Height</th>
+                <th>Number of Steps</th>
+                <th>Error over {results.printHeight / 10}cm</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.layerHeights.map((layerHeight) => (
+                <tr key={layerHeight.height}>
+                  <td
+                    className={
+                      layerHeight.steps % 1 === 0
+                        ? 'text-success'
+                        : 'text-danger'
+                    }
+                  >
+                    {layerHeight.height.toFixed(4)} mm
+                  </td>
+                  <td>{layerHeight.steps}</td>
+                  <td>{layerHeight.error} mm</td>
                 </tr>
-              </thead>
-              <tbody>
-                {results.layerHeights.map((layerHeight) => (
-                  <tr key={layerHeight.height}>
-                    <td
-                      className={
-                        layerHeight.steps % 1 === 0
-                          ? 'text-success'
-                          : 'text-danger'
-                      }
-                    >
-                      {layerHeight.height.toFixed(4)} mm
-                    </td>
-                    <td>{layerHeight.steps}</td>
-                    <td>{layerHeight.error} mm</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          )}
-        </ResultsCard>
-      )}
+              ))}
+            </tbody>
+          </Table>
+        )}
+      </ResultsCard>
     </Fragment>
   );
 }

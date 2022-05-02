@@ -2,6 +2,10 @@ import PropTypes from 'prop-types';
 import { Card, Row, Col } from 'react-bootstrap';
 
 export default function ResultsCard({ children, results, title = 'Results' }) {
+  if (!children && !results) {
+    return null;
+  }
+
   return (
     <Card body className="my-4">
       <Card.Title>{title}</Card.Title>

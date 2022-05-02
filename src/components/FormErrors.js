@@ -18,5 +18,5 @@ export default function FormErrors({ errors }) {
 }
 
 FormErrors.propTypes = {
-  errors: PropTypes.arrayOf(PropTypes.string)
+  errors: PropTypes.arrayOf(PropTypes.string).isRequired
 };

@@ -178,9 +178,7 @@ export default function SpoolDimensions() {
         </Form.Group>
       </Form>
       <FormErrors errors={errors} />
-      {Boolean(results) && (
-        <ResultsCard results={results} title="Remaining Filament" />
-      )}
+      <ResultsCard results={results} title="Remaining Filament" />
     </Fragment>
   );
 }

@@ -151,7 +151,7 @@ export default function SpoolEditForm({
 
 SpoolEditForm.propTypes = {
   form: PropTypes.shape({
-    values: PropTypes.object,
+    values: PropTypes.object.isRequired,
     setFieldValue: PropTypes.func.isRequired,
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired

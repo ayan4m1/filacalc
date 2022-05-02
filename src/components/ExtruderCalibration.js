@@ -141,14 +141,12 @@ export default function ExtruderCalibration() {
         </Form.Group>
       </Form>
       <FormErrors errors={errors} />
-      {Boolean(results) && (
-        <ResultsCard title="Result">
-          <p>
-            The corrected value is{' '}
-            <strong>{results.stepsPerMm.toFixed(2)} steps/mm.</strong>
-          </p>
-        </ResultsCard>
-      )}
+      <ResultsCard title="Result">
+        <p>
+          The corrected value is{' '}
+          <strong>{results.stepsPerMm.toFixed(2)} steps/mm.</strong>
+        </p>
+      </ResultsCard>
     </Fragment>
   );
 }
