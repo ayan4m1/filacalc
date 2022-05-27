@@ -109,8 +109,8 @@ export default () => {
       }
     });
 
-    reader.addEventListener('error', () => {
-      postMessage({ type: 'error' });
+    reader.addEventListener('error', (error) => {
+      postMessage({ type: 'error', error });
     });
 
     reader.readAsText(data);
