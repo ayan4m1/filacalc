@@ -1,6 +1,3 @@
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-
 import { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';

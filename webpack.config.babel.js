@@ -7,8 +7,10 @@ import StylelintPlugin from 'stylelint-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 const dev = process.env.NODE_ENV === 'development';
+const analyzeBundle = process.env.BUNDLE_ANALYZE === 'true';
 
 const plugins = [
   new CleanPlugin(),
@@ -26,6 +28,10 @@ const plugins = [
   new MiniCssExtractPlugin(),
   new CnameWebpackPlugin({ domain: 'filacalc.com' })
 ];
+
+if (analyzeBundle) {
+  plugins.push(new BundleAnalyzerPlugin());
+}
 
 export default {
   mode: dev ? 'development' : 'production',
@@ -82,7 +88,7 @@ export default {
   },
   output: {
     path: resolve(__dirname, 'dist'),
-    filename: 'main.js',
+    filename: '[name].js',
     chunkFilename: '[name].js'
   },
   plugins,
@@ -102,6 +108,20 @@ export default {
         }
       }),
       new CssMinimizerPlugin()
-    ]
+    ],
+    splitChunks: {
+      cacheGroups: {
+        react: {
+          test: /[\\/]node_modules[\\/]react(-router)?(-dom)?[\\/]/,
+          reuseExistingChunk: false,
+          chunks: 'all'
+        },
+        spools: {
+          test: /[\\/]node_modules[\\/](react-color|react-datepicker|tinycolor2)[\\/]/,
+          reuseExistingChunk: false,
+          chunks: 'all'
+        }
+      }
+    }
   }
 };
