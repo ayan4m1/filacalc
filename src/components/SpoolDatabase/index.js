@@ -75,6 +75,7 @@ const SpoolSchema = Yup.object({
 });
 
 export default function SpoolDatabase() {
+  const { filamentDiameter } = useSettingsContext();
   const initialValues = {
     name: 'Spool',
     material: 'PLA',
@@ -83,7 +84,7 @@ export default function SpoolDatabase() {
     netWeight: 1000,
     spoolWeight: 250,
     currentWeight: 1250,
-    filamentDiameter: 1.75,
+    filamentDiameter,
     purchaseDate: formatISO(new Date()),
     purchaseCost: 0
   };

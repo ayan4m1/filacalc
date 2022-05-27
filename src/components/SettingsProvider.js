@@ -5,6 +5,12 @@ import useLocalStorageState from 'use-local-storage-state';
 import { SettingsContext } from 'hooks/useSettingsContext';
 
 export default function SettingsProvider({ children }) {
+  const [filamentDiameter, setFilamentDiameter] = useLocalStorageState(
+    'filamentDiameter',
+    {
+      defaultValue: 1.75
+    }
+  );
   const [spools, setSpools] = useLocalStorageState('spools', {
     defaultValue: []
   });
@@ -51,7 +57,9 @@ export default function SettingsProvider({ children }) {
         addSpool,
         updateSpool,
         removeSpool,
-        setSpools
+        setSpools,
+        filamentDiameter,
+        setFilamentDiameter
       }}
     >
       {children}

@@ -4,10 +4,19 @@ import {
   faWeightHanging,
   faWeightScale,
   faHeart,
-  faDatabase
+  faDatabase,
+  faRuler,
+  faGauge
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import {
+  Navbar,
+  Nav,
+  Container,
+  Dropdown,
+  NavLink,
+  NavItem
+} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 import spoolLogo from 'images/filament-spool.svg';
@@ -32,9 +41,19 @@ export default function Header() {
             <Nav.Link as={Link} to="/filament">
               <FontAwesomeIcon icon={faWeightHanging} /> Filament Usage
             </Nav.Link>
-            <Nav.Link as={Link} to="/spool">
-              <FontAwesomeIcon icon={faWeightScale} /> Spool Usage
-            </Nav.Link>
+            <Dropdown as={NavItem}>
+              <Dropdown.Toggle as={NavLink}>
+                <FontAwesomeIcon icon={faGauge} /> Spool Usage
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item as={Link} to="/spool/weight">
+                  <FontAwesomeIcon icon={faWeightScale} /> Weight
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/spool/dimensions">
+                  <FontAwesomeIcon icon={faRuler} /> Dimensions
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
             <Nav.Link as={Link} to="/extruder">
               <FontAwesomeIcon icon={faRulerHorizontal} /> Extruder Calibration
             </Nav.Link>
