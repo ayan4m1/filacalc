@@ -246,9 +246,7 @@ export default function SpoolDatabase() {
   return (
     <Fragment>
       <Helmet title="Spool Database" />
-      {showEditForm && (
-        <SpoolEditForm form={form} onHide={hideForm} show={showEditForm} />
-      )}
+      {showEditForm && <SpoolEditForm form={form} onHide={hideForm} />}
       {selectedId && showPrintForm && (
         <SpoolPrintForm
           onHide={hidePrintForm}
