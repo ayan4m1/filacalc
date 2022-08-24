@@ -4,9 +4,7 @@ import { Fragment } from 'react';
 import { Card, Alert, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-export const Calculator = ({ children }) => {
-  return <Fragment>{children}</Fragment>;
-};
+export const Calculator = ({ children }) => <Fragment>{children}</Fragment>;
 
 const Description = ({ children }) =>
   Boolean(children) && <div className="my-4">{children}</div>;
