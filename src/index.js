@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 import './index.scss';
@@ -9,32 +9,35 @@ import Layout from 'components/Layout';
 import SettingsProvider from 'components/SettingsProvider';
 import SuspenseFallback from 'components/SuspenseFallback';
 
-const Home = lazy(() =>
-  import(/* webpackChunkName: "home" */ 'components/Home')
+const Home = lazy(
+  () => import(/* webpackChunkName: "home" */ 'components/Home')
 );
-const FilamentUsage = lazy(() =>
-  import(/* webpackChunkName: "filament" */ 'components/FilamentUsage')
+const FilamentUsage = lazy(
+  () => import(/* webpackChunkName: "filament" */ 'components/FilamentUsage')
 );
-const SpoolWeight = lazy(() =>
-  import(/* webpackChunkName: "spool" */ 'components/SpoolWeight')
+const SpoolWeight = lazy(
+  () => import(/* webpackChunkName: "spool" */ 'components/SpoolWeight')
 );
-const SpoolDimensions = lazy(() =>
-  import(/* webpackChunkName: "spool" */ 'components/SpoolDimensions')
+const SpoolDimensions = lazy(
+  () => import(/* webpackChunkName: "spool" */ 'components/SpoolDimensions')
 );
-const ExtruderCalibration = lazy(() =>
-  import(/* webpackChunkName: "extruder" */ 'components/ExtruderCalibration')
+const ExtruderCalibration = lazy(
+  () =>
+    import(/* webpackChunkName: "extruder" */ 'components/ExtruderCalibration')
 );
-const VolumetricFlow = lazy(() =>
-  import(/* webpackChunkName: "flow" */ 'components/VolumetricFlow')
+const VolumetricFlow = lazy(
+  () => import(/* webpackChunkName: "flow" */ 'components/VolumetricFlow')
 );
-const ZAxisCalibration = lazy(() =>
-  import(/* webpackChunkName: "zaxis" */ 'components/ZAxisCalibration')
+const ZAxisCalibration = lazy(
+  () => import(/* webpackChunkName: "zaxis" */ 'components/ZAxisCalibration')
 );
-const SpoolDatabase = lazy(() =>
-  import(/* webpackChunkName: "spools" */ 'components/SpoolDatabase')
+const SpoolDatabase = lazy(
+  () => import(/* webpackChunkName: "spools" */ 'components/SpoolDatabase')
 );
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+
+root.render(
   <SettingsProvider>
     <Router>
       <Suspense fallback={<SuspenseFallback />}>
@@ -54,6 +57,5 @@ ReactDOM.render(
         </Routes>
       </Suspense>
     </Router>
-  </SettingsProvider>,
-  document.getElementById('root')
+  </SettingsProvider>
 );
