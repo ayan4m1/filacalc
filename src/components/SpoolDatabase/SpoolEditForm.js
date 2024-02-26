@@ -1,8 +1,9 @@
-import { parseISO, formatISO } from 'date-fns';
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
-import { SketchPicker } from 'react-color';
 import DatePicker from 'react-datepicker';
+import { SketchPicker } from 'react-color';
+// eslint-disable-next-line import/no-unresolved
+import { parseISO, formatISO } from 'date-fns';
 import { Form, Modal, Button } from 'react-bootstrap';
 
 import { materials } from 'utils';
