@@ -26,7 +26,7 @@ const plugins = [
   }),
   new ESLintPlugin(),
   new MiniCssExtractPlugin(),
-  new CnameWebpackPlugin({ domain: 'filacalc.com' })
+  new CnameWebpackPlugin({ domain: 'filacalc.andrewdelisa.com' })
 ];
 
 if (analyzeBundle) {
