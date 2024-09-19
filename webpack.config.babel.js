@@ -24,7 +24,10 @@ const plugins = [
   new HtmlPlugin({
     template: './src/index.html'
   }),
-  new ESLintPlugin(),
+  new ESLintPlugin({
+    configType: 'flat',
+    eslintPath: 'eslint/use-at-your-own-risk'
+  }),
   new MiniCssExtractPlugin(),
   new CnameWebpackPlugin({ domain: 'filacalc.andrewdelisa.com' })
 ];
