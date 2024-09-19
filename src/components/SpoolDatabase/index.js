@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { parseISO, format, formatISO } from 'date-fns';
 import {
   faClone,
@@ -139,7 +138,6 @@ export default function SpoolDatabase() {
     setShowEditForm(true);
   }, [setShowEditForm, setFieldValue, findSpool, selectedId]);
   const handleRemove = useCallback(() => {
-    // eslint-disable-next-line no-alert
     if (selectedId && confirm('Are you sure you want to delete this spool?')) {
       removeSpool(selectedId);
     }
@@ -195,7 +193,6 @@ export default function SpoolDatabase() {
         } = loaded;
         const parsed = JSON.parse(result);
 
-        /* eslint-disable no-alert */
         if (
           parsed &&
           alert(
@@ -205,7 +202,6 @@ export default function SpoolDatabase() {
           setSelectedId(null);
           setSpools(parsed);
         }
-        /* eslint-enable no-alert */
       };
       reader.readAsText(file);
     },
@@ -220,7 +216,6 @@ export default function SpoolDatabase() {
     [spools]
   );
   const hideForm = useCallback(() => {
-    // eslint-disable-next-line no-alert
     if (confirm('Are you sure you want to cancel?')) {
       setShowEditForm(false);
     }

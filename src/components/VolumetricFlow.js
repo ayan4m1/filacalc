@@ -49,13 +49,11 @@ export default function VolumetricFlow() {
       const desiredFlowRate =
         vals.extrusionWidth * vals.layerHeight * vals.printSpeed;
 
-      // eslint-disable-next-line
       console.dir(
         `${newNozzleVolume.toFixed(2)} mm^3 + ${newMeltZoneVolume.toFixed(
           2
         )} mm^3 = ${totalMeltVolume.toFixed(2)} mm^3`
       );
-      // eslint-disable-next-line
       console.dir(`${desiredFlowRate} mm^3/s`);
     }, [])
   });
