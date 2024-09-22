@@ -3,5 +3,6 @@
     "@babel/preset-env",
     ["@babel/preset-react", { "runtime": "automatic" }]
   ],
-  "ignore": ["./src/workers"]
+  "ignore": ["./src/workers"],
+  "plugins": ["path-chunk-name"]
 }

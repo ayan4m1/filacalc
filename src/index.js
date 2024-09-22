@@ -9,31 +9,16 @@ import Layout from 'components/Layout';
 import SettingsProvider from 'components/SettingsProvider';
 import SuspenseFallback from 'components/SuspenseFallback';
 
-const Home = lazy(
-  () => import(/* webpackChunkName: "home" */ 'components/Home')
-);
-const FilamentUsage = lazy(
-  () => import(/* webpackChunkName: "filament" */ 'components/FilamentUsage')
-);
-const SpoolWeight = lazy(
-  () => import(/* webpackChunkName: "spool" */ 'components/SpoolWeight')
-);
-const SpoolDimensions = lazy(
-  () => import(/* webpackChunkName: "spool" */ 'components/SpoolDimensions')
-);
+const Home = lazy(() => import('components/Home'));
+const FilamentUsage = lazy(() => import('components/FilamentUsage'));
+const SpoolWeight = lazy(() => import('components/SpoolWeight'));
+const SpoolDimensions = lazy(() => import('components/SpoolDimensions'));
 const ExtruderCalibration = lazy(
-  () =>
-    import(/* webpackChunkName: "extruder" */ 'components/ExtruderCalibration')
+  () => import('components/ExtruderCalibration')
 );
-const VolumetricFlow = lazy(
-  () => import(/* webpackChunkName: "flow" */ 'components/VolumetricFlow')
-);
-const ZAxisCalibration = lazy(
-  () => import(/* webpackChunkName: "zaxis" */ 'components/ZAxisCalibration')
-);
-const SpoolDatabase = lazy(
-  () => import(/* webpackChunkName: "spools" */ 'components/SpoolDatabase')
-);
+const VolumetricFlow = lazy(() => import('components/VolumetricFlow'));
+const ZAxisCalibration = lazy(() => import('components/ZAxisCalibration'));
+const SpoolDatabase = lazy(() => import('components/SpoolDatabase'));
 
 const root = createRoot(document.getElementById('root'));
 
