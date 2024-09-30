@@ -40,5 +40,11 @@ export default [
       }
     }
   },
+  {
+    files: ['./webpack.config.babel.js'],
+    languageOptions: {
+      globals: globals.node
+    }
+  },
   prettierPlugin
 ];
