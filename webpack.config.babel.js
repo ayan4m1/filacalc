@@ -1,9 +1,11 @@
 import { resolve } from 'path';
+import autoprefixer from 'autoprefixer';
 import HtmlPlugin from 'html-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import CnameWebpackPlugin from 'cname-webpack-plugin';
 import StylelintPlugin from 'stylelint-webpack-plugin';
+import postcssFlexbugsFixes from 'postcss-flexbugs-fixes';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
@@ -14,23 +16,28 @@ const analyzeBundle = process.env.BUNDLE_ANALYZE === 'true';
 
 const plugins = [
   new CleanPlugin(),
-  new StylelintPlugin({
-    configFile: '.stylelintrc',
-    context: 'src',
-    files: '**/*.scss',
-    failOnError: true,
-    quiet: false
-  }),
   new HtmlPlugin({
     template: './src/index.html'
-  }),
-  new ESLintPlugin({
-    configType: 'flat',
-    eslintPath: 'eslint/use-at-your-own-risk'
   }),
   new MiniCssExtractPlugin(),
   new CnameWebpackPlugin({ domain: 'filacalc.andrewdelisa.com' })
 ];
+
+if (dev) {
+  plugins.push(
+    new StylelintPlugin({
+      configFile: '.stylelintrc',
+      context: 'src',
+      files: '**/*.scss',
+      failOnError: true,
+      quiet: false
+    }),
+    new ESLintPlugin({
+      configType: 'flat',
+      eslintPath: 'eslint/use-at-your-own-risk'
+    })
+  );
+}
 
 if (analyzeBundle) {
   plugins.push(new BundleAnalyzerPlugin());
@@ -38,7 +45,7 @@ if (analyzeBundle) {
 
 export default {
   mode: dev ? 'development' : 'production',
-  devtool: dev ? 'eval-cheap-module-source-map' : 'cheap-module-source-map',
+  devtool: dev ? 'eval-cheap-module-source-map' : false,
   entry: './src/index.js',
   devServer: {
     compress: dev,
@@ -63,15 +70,19 @@ export default {
             options: {
               postcssOptions: {
                 ident: 'postcss',
-                plugins: [
-                  require('autoprefixer'),
-                  require('postcss-flexbugs-fixes')
-                ]
+                plugins: [autoprefixer, postcssFlexbugsFixes]
               },
               sourceMap: dev
             }
           },
-          'sass-loader'
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                quietDeps: true
+              }
+            }
+          }
         ]
       },
       {
@@ -104,14 +115,7 @@ export default {
     }
   },
   optimization: {
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          ecma: 12
-        }
-      }),
-      new CssMinimizerPlugin()
-    ],
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
     splitChunks: {
       cacheGroups: {
         react: {

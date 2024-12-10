@@ -41,7 +41,7 @@ export default [
     }
   },
   {
-    files: ['./webpack.config.babel.js'],
+    files: ['webpack.config.babel.js'],
     languageOptions: {
       globals: globals.node
     }
