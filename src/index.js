@@ -1,6 +1,6 @@
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 
 import './index.scss';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,39 +8,51 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Layout from 'components/Layout';
 import SettingsProvider from 'components/SettingsProvider';
 import SuspenseFallback from 'components/SuspenseFallback';
+import ErrorBoundary from 'components/ErrorBoundary';
 
-const Home = lazy(() => import('components/Home'));
-const FilamentUsage = lazy(() => import('components/FilamentUsage'));
-const SpoolWeight = lazy(() => import('components/SpoolWeight'));
-const SpoolDimensions = lazy(() => import('components/SpoolDimensions'));
-const ExtruderCalibration = lazy(
-  () => import('components/ExtruderCalibration')
-);
-const VolumetricFlow = lazy(() => import('components/VolumetricFlow'));
-const ZAxisCalibration = lazy(() => import('components/ZAxisCalibration'));
-const SpoolDatabase = lazy(() => import('components/SpoolDatabase'));
+const createRouteForPage = (pathOrIndex, pageName) => {
+  const result = {};
 
+  if (typeof pathOrIndex === 'boolean') {
+    result.index = pathOrIndex;
+  } else if (typeof pathOrIndex === 'string') {
+    result.path = pathOrIndex;
+  }
+
+  result.lazy = async () => ({
+    Component: (await import(`components/${pageName}`)).default
+  });
+
+  return result;
+};
+const router = createHashRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      createRouteForPage(true, 'Home'),
+      createRouteForPage('filament', 'FilamentUsage'),
+      {
+        path: '/spool',
+        children: [
+          createRouteForPage('weight', 'SpoolWeight'),
+          createRouteForPage('dimensions', 'SpoolDimensions')
+        ]
+      },
+      createRouteForPage('extruder', 'ExtruderCalibration'),
+      createRouteForPage('flow', 'VolumetricFlow'),
+      createRouteForPage('z-axis', 'ZAxisCalibration'),
+      createRouteForPage('spools', 'SpoolDatabase')
+    ]
+  }
+]);
 const root = createRoot(document.getElementById('root'));
 
 root.render(
   <SettingsProvider>
-    <Router>
-      <Suspense fallback={<SuspenseFallback />}>
-        <Routes>
-          <Route element={<Layout />} path="/">
-            <Route element={<Home />} index />
-            <Route element={<FilamentUsage />} path="filament" />
-            <Route path="/spool">
-              <Route element={<SpoolWeight />} path="weight" />
-              <Route element={<SpoolDimensions />} path="dimensions" />
-            </Route>
-            <Route element={<ExtruderCalibration />} path="extruder" />
-            <Route element={<VolumetricFlow />} path="flow" />
-            <Route element={<ZAxisCalibration />} path="z-axis" />
-            <Route element={<SpoolDatabase />} path="spools" />
-          </Route>
-        </Routes>
-      </Suspense>
-    </Router>
+    <Suspense fallback={<SuspenseFallback />}>
+      <RouterProvider router={router} />
+    </Suspense>
   </SettingsProvider>
 );
