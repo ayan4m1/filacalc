@@ -1,7 +1,8 @@
 {
   "name": "filacalc",
+  "private": true,
   "version": "0.1.0",
-  "description": "",
+  "description": "FDM printing toolkit",
   "author": "ayan4m1 <andrew@bulletlogic.com>",
   "license": "MIT",
   "scripts": {
