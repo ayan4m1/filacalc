@@ -12,14 +12,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import fileDownload from 'js-file-download';
-import {
-  forwardRef,
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { getContrastingColor } from 'react-color/lib/helpers/color';
 import {
   Badge,
@@ -40,13 +33,6 @@ import { useSettingsContext } from 'hooks/useSettingsContext';
 import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
 import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
 import { getRemainingFilament } from 'utils';
-
-/* Needed because we use this with an OverlayTrigger */
-const Icon = forwardRef((props, ref) => (
-  <FontAwesomeIcon forwardedRef={ref} {...props} />
-));
-
-Icon.displayName = 'Icon';
 
 const SpoolSchema = Yup.object({
   name: Yup.string().required('Name must be provided.'),
@@ -255,14 +241,14 @@ export default function SpoolDatabase() {
           <div className="d-flex align-items-center">
             <h1 className="me-2">Spool Database</h1>
             <OverlayTrigger
-              overlay={
-                <Tooltip>
+              overlay={(props) => (
+                <Tooltip {...props}>
                   All data is saved to your browser&apos;s local storage.
                 </Tooltip>
-              }
+              )}
               placement="right"
             >
-              <Icon icon={faQuestionCircle} />
+              <FontAwesomeIcon icon={faQuestionCircle} />
             </OverlayTrigger>
           </div>
         </Col>
