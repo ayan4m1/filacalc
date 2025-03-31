@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { parseISO, format, formatISO } from 'date-fns';
 import {
   faClone,
@@ -107,7 +108,7 @@ export default function SpoolDatabase() {
     handleReset();
     setShowEditForm(true);
     setSelectedId(null);
-  }, [setShowEditForm, setSelectedId, handleReset]);
+  }, [handleReset]);
   const handleEdit = useCallback(() => {
     if (!selectedId) {
       return;
@@ -181,7 +182,7 @@ export default function SpoolDatabase() {
 
         if (
           parsed &&
-          alert(
+          confirm(
             'Are you sure you want to overwrite your current spool database?'
           )
         ) {
@@ -205,14 +206,11 @@ export default function SpoolDatabase() {
     if (confirm('Are you sure you want to cancel?')) {
       setShowEditForm(false);
     }
-  }, [setShowEditForm]);
-  const hidePrintForm = useCallback(
-    () => setShowPrintForm(false),
-    [setShowPrintForm]
-  );
+  }, []);
+  const hidePrintForm = useCallback(() => setShowPrintForm(false), []);
   const toggleSelected = useCallback(
     (id) => setSelectedId((selId) => (selId === id ? null : id)),
-    [setSelectedId]
+    []
   );
 
   useEffect(() => {
@@ -223,12 +221,18 @@ export default function SpoolDatabase() {
         0
       )
     );
-  }, [setTotalWeight, setTotalRemaining, spools]);
+  }, [spools]);
 
   return (
     <Fragment>
       <Helmet title="Spool Database" />
-      {showEditForm && <SpoolEditForm form={form} onHide={hideForm} />}
+      {showEditForm && (
+        <SpoolEditForm
+          form={form}
+          isSpoolSelected={Boolean(selectedId)}
+          onHide={hideForm}
+        />
+      )}
       {selectedId && showPrintForm && (
         <SpoolPrintForm
           onHide={hidePrintForm}
@@ -305,69 +309,77 @@ export default function SpoolDatabase() {
           <tr>
             <th style={{ width: '30%' }}>Name</th>
             <th>Material</th>
-            <th className="text-center">Purchased</th>
+            <th>Purchased</th>
             <th className="text-end">Net Weight</th>
             <th className="text-end">Cost / kg</th>
-            <th className="text-end" style={{ width: '20%' }}>
+            <th className="text-center" style={{ width: '20%' }}>
               %
             </th>
-            <th className="text-end">Mass</th>
-            <th className="text-end">Length</th>
+            <th className="text-center">Mass</th>
+            <th className="text-center">Length</th>
           </tr>
         </thead>
         <tbody>
           {!spools?.length && (
             <tr>
-              <td colSpan={8}>No spools.</td>
+              <td className="text-center" colSpan={8}>
+                No spools have been added.
+              </td>
             </tr>
           )}
-          {spools.map((spool) => {
+          {spools?.map?.((spool) => {
             const { mass: remainingMass, length: remainingLength } =
               getRemainingFilament(spool);
-            const rowClasses =
-              selectedId === spool.id ? 'bg-dark text-light' : '';
             const purchaseDate = format(
               parseISO(spool.purchaseDate),
               'yyyy-MM-dd'
             );
             const material =
               spool.material === 'custom' ? 'Custom' : spool.material;
+            const isSelected = selectedId === spool.id;
+            const colClasses = classNames(isSelected && 'bg-primary');
+            const colRightClasses = classNames(
+              'text-end',
+              isSelected && 'bg-primary'
+            );
 
             return (
-              <tr
-                className={rowClasses}
-                key={spool.id}
-                onClick={() => toggleSelected(spool.id)}
-              >
-                <td>
+              <tr key={spool.id} onClick={() => toggleSelected(spool.id)}>
+                <td className={colClasses}>
                   <Badge
                     bg=""
                     style={{
                       color: getContrastingColor(spool.color),
-                      backgroundColor: spool.color
+                      backgroundColor: spool.color,
+                      boxShadow: '2px 2px 4px #262323'
                     }}
                   >
                     {spool.name}
                   </Badge>
                 </td>
-                <td>{material}</td>
-                <td className="text-center">{purchaseDate}</td>
-                <td className="text-end">{spool.netWeight} g</td>
-                <td className="text-end">
+                <td className={colClasses}>{material}</td>
+                <td className={colClasses}>{purchaseDate}</td>
+                <td className={colRightClasses}>{spool.netWeight} g</td>
+                <td className={colRightClasses}>
                   {Boolean(spool.purchaseCost) &&
                     ((spool.purchaseCost / spool.netWeight) * 1e3).toFixed(2)}
                 </td>
-                <td className="text-end">
+                <td className={colRightClasses}>
                   <ProgressBar
                     className="text-light"
                     label={`${Math.floor(
                       (remainingMass / spool.netWeight) * 1e2
                     )}%`}
                     now={(remainingMass / spool.netWeight) * 1e2}
+                    variant="info"
                   />
                 </td>
-                <td className="text-end">{remainingMass.toFixed(2)} g</td>
-                <td className="text-end">{remainingLength.toFixed(2)} m</td>
+                <td className={colRightClasses}>
+                  {remainingMass.toFixed(2)} g
+                </td>
+                <td className={colRightClasses}>
+                  {remainingLength.toFixed(2)} m
+                </td>
               </tr>
             );
           })}

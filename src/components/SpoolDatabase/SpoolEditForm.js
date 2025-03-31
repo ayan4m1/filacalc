@@ -8,6 +8,7 @@ import { Form, Modal, Button } from 'react-bootstrap';
 import { materials } from 'utils';
 
 export default function SpoolEditForm({
+  isSpoolSelected,
   form: { errors, values, handleChange, handleSubmit, setFieldValue },
   onHide
 }) {
@@ -24,7 +25,7 @@ export default function SpoolEditForm({
     <Modal dialogClassName="modal-90w" onHide={onHide} show={true}>
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
-          <Modal.Title>{values ? 'Edit' : 'Create'} a Spool</Modal.Title>
+          <Modal.Title>{isSpoolSelected ? 'Edit' : 'Add'} a Spool</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group>
@@ -202,6 +203,7 @@ export default function SpoolEditForm({
 }
 
 SpoolEditForm.propTypes = {
+  isSpoolSelected: PropTypes.bool.isRequired,
   form: PropTypes.shape({
     errors: PropTypes.object.isRequired,
     values: PropTypes.object.isRequired,
