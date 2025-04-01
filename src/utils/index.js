@@ -93,3 +93,11 @@ export const getRemainingFilament = (spool) => {
     percent
   };
 };
+
+export const getAsciiBytes = (str) =>
+  Uint8Array.from(str.split('').map((char) => char.charCodeAt(0)));
+
+export const getAsciiString = (bytes) =>
+  String.fromCharCode.apply(null, Array.from(bytes));
+
+export const supportsWebSerial = 'serial' in navigator;

@@ -3,6 +3,7 @@ import { parseISO, format, formatISO } from 'date-fns';
 import {
   faClone,
   faDownload,
+  faLightbulb,
   faPencil,
   faPlusCircle,
   faPrint,
@@ -33,7 +34,7 @@ import * as Yup from 'yup';
 import { useSettingsContext } from 'hooks/useSettingsContext';
 import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
 import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
-import { getRemainingFilament } from 'utils';
+import { getRemainingFilament, supportsWebSerial } from 'utils';
 
 const SpoolSchema = Yup.object({
   name: Yup.string().required('Name must be provided.'),
@@ -62,6 +63,8 @@ const SpoolSchema = Yup.object({
 });
 
 export default function SpoolDatabase() {
+  const [showAddTd1Button, setShowAddTd1Button] = useState(supportsWebSerial);
+  const [serialPort, setSerialPort] = useState(null);
   const { filamentDiameter } = useSettingsContext();
   const initialValues = {
     name: 'Spool',
@@ -72,6 +75,7 @@ export default function SpoolDatabase() {
     spoolWeight: 250,
     currentWeight: 1250,
     filamentDiameter,
+    transmissionDistance: 0,
     purchaseDate: formatISO(new Date()),
     purchaseCost: 0
   };
@@ -127,6 +131,7 @@ export default function SpoolDatabase() {
   const handleRemove = useCallback(() => {
     if (selectedId && confirm('Are you sure you want to delete this spool?')) {
       removeSpool(selectedId);
+      setSelectedId(null);
     }
   }, [removeSpool, selectedId]);
   const handleClone = useCallback(() => {
@@ -212,6 +217,22 @@ export default function SpoolDatabase() {
     (id) => setSelectedId((selId) => (selId === id ? null : id)),
     []
   );
+  const handleAddTd1 = async () => {
+    try {
+      const grantedPort = await navigator.serial.requestPort({
+        filters: [{ usbVendorId: 0xe4b2, usbProductId: 0x0045 }]
+      });
+
+      if (grantedPort) {
+        setShowAddTd1Button(false);
+        setSerialPort(grantedPort);
+      }
+    } catch (error) {
+      if (!error.message.includes('No port selected')) {
+        alert(error.message);
+      }
+    }
+  };
 
   useEffect(() => {
     setTotalWeight(spools.reduce((prev, curr) => prev + curr.netWeight, 0));
@@ -223,6 +244,21 @@ export default function SpoolDatabase() {
     );
   }, [spools]);
 
+  useEffect(() => {
+    const enumerateSerialPorts = async () => {
+      const existingPorts = await navigator.serial.getPorts();
+
+      if (existingPorts.length) {
+        setShowAddTd1Button(false);
+        setSerialPort(existingPorts[0]);
+      }
+    };
+
+    if (supportsWebSerial) {
+      enumerateSerialPorts();
+    }
+  }, []);
+
   return (
     <Fragment>
       <Helmet title="Spool Database" />
@@ -231,6 +267,7 @@ export default function SpoolDatabase() {
           form={form}
           isSpoolSelected={Boolean(selectedId)}
           onHide={hideForm}
+          serialPort={serialPort}
         />
       )}
       {selectedId && showPrintForm && (
@@ -270,6 +307,11 @@ export default function SpoolDatabase() {
             <Button onClick={handleExport}>
               <FontAwesomeIcon icon={faDownload} /> Export
             </Button>
+            {showAddTd1Button && (
+              <Button onClick={handleAddTd1}>
+                <FontAwesomeIcon icon={faLightbulb} /> Add TD-1
+              </Button>
+            )}
           </ButtonGroup>
         </Col>
       </Row>

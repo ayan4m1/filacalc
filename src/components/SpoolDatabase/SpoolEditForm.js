@@ -1,17 +1,41 @@
 import PropTypes from 'prop-types';
-import { useCallback } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { SketchPicker } from 'react-color';
 import { parseISO, formatISO } from 'date-fns';
-import { Form, Modal, Button } from 'react-bootstrap';
+import {
+  faDownload,
+  faInfoCircle,
+  faQuestionCircle,
+  faSpinner
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  Form,
+  Modal,
+  Button,
+  Container,
+  Row,
+  Col,
+  InputGroup,
+  OverlayTrigger,
+  Tooltip
+} from 'react-bootstrap';
 
-import { materials } from 'utils';
+import useTd1Serial from 'hooks/useTd1Serial';
+import { materials, supportsWebSerial } from 'utils';
 
 export default function SpoolEditForm({
   isSpoolSelected,
   form: { errors, values, handleChange, handleSubmit, setFieldValue },
-  onHide
+  onHide,
+  serialPort
 }) {
+  const [connected, setConnected] = useState(false);
+  const { waiting, connect, disconnect } = useTd1Serial({
+    serialPort,
+    setFieldValue
+  });
   const handleDateChange = useCallback(
     (date) => setFieldValue('purchaseDate', formatISO(date)),
     [setFieldValue]
@@ -20,14 +44,44 @@ export default function SpoolEditForm({
     (color) => setFieldValue('color', color.hex),
     [setFieldValue]
   );
+  const handleFetchClick = useCallback(() => {
+    if (connected) {
+      disconnect();
+    } else {
+      connect();
+    }
+
+    setConnected((val) => !val);
+  }, [connect, disconnect, connected]);
+
+  useEffect(() => {
+    return async () => {
+      try {
+        await disconnect();
+      } catch (error) {
+        console.error(error);
+        console.log('Failed to close serial port!');
+      }
+    };
+  }, [disconnect]);
 
   return (
-    <Modal dialogClassName="modal-90w" onHide={onHide} show={true}>
+    <Modal onHide={onHide} show={true}>
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
           <Modal.Title>{isSpoolSelected ? 'Edit' : 'Add'} a Spool</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {waiting && (
+            <Container className="mb-2" fluid>
+              <Row>
+                <Col className="d-flex justify-content-center">
+                  <h1 className="flex-grow-1">Insert filament...</h1>
+                  <FontAwesomeIcon icon={faSpinner} size="3x" spin />
+                </Col>
+              </Row>
+            </Container>
+          )}
           <Form.Group>
             <Form.Label>Spool Name</Form.Label>
             <Form.Control
@@ -89,11 +143,17 @@ export default function SpoolEditForm({
             <Form.Control.Feedback type="invalid">
               {errors.color}
             </Form.Control.Feedback>
-            <SketchPicker
-              className="my-2"
-              color={values.color}
-              onChange={handleColorChange}
-            />
+            <Container fluid>
+              <Row>
+                <Col className="d-flex justify-content-center">
+                  <SketchPicker
+                    className="my-2"
+                    color={values.color}
+                    onChange={handleColorChange}
+                  />
+                </Col>
+              </Row>
+            </Container>
           </Form.Group>
           <Form.Group>
             <Form.Label>Net Weight (g)</Form.Label>
@@ -162,6 +222,63 @@ export default function SpoolEditForm({
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
+            <Form.Label>
+              Transmission Distance (TD){' '}
+              <OverlayTrigger
+                overlay={(props) => (
+                  <Tooltip {...props}>
+                    Transmission distance is used by HueForge for color
+                    blending.
+                  </Tooltip>
+                )}
+                placement="right"
+              >
+                <FontAwesomeIcon icon={faQuestionCircle} />
+              </OverlayTrigger>
+            </Form.Label>
+            <InputGroup>
+              <Form.Control
+                isInvalid={Boolean(errors.transmissionDistance)}
+                min="0"
+                name="transmissionDistance"
+                onChange={handleChange}
+                step="0.1"
+                type="number"
+                value={values.transmissionDistance}
+              />
+              {serialPort?.connected && supportsWebSerial && (
+                <Fragment>
+                  <Button onClick={handleFetchClick}>
+                    <FontAwesomeIcon
+                      icon={waiting ? faSpinner : faDownload}
+                      spin={waiting}
+                    />{' '}
+                    {waiting ? 'Insert filament...' : 'Fetch from TD-1'}
+                  </Button>
+                  <OverlayTrigger
+                    overlay={(props) => (
+                      <Tooltip {...props}>Click to visit AJAX-3D</Tooltip>
+                    )}
+                    placement="left"
+                  >
+                    <Button
+                      as="a"
+                      href="https://www.patreon.com/AJAX_3D"
+                      rel="noopener"
+                      target="_blank"
+                      variant="info"
+                    >
+                      <FontAwesomeIcon icon={faInfoCircle} />
+                    </Button>
+                  </OverlayTrigger>
+                </Fragment>
+              )}
+            </InputGroup>
+            <Form.Control.Feedback type="invalid">
+              {errors.transmissionDistance}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group>
             <Form.Label>Purchase Date</Form.Label>
             <Form.Control
               as={DatePicker}
@@ -211,5 +328,6 @@ SpoolEditForm.propTypes = {
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired
   }).isRequired,
-  onHide: PropTypes.func.isRequired
+  onHide: PropTypes.func.isRequired,
+  serialPort: PropTypes.object
 };

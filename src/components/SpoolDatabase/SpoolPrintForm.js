@@ -10,7 +10,7 @@ import {
   Col,
   Spinner,
   ProgressBar,
-  Alert
+  Card
 } from 'react-bootstrap';
 import * as Yup from 'yup';
 
@@ -66,7 +66,7 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
 
   if (loading) {
     return (
-      <Modal onHide={onHide} show={true}>
+      <Modal onHide={onHide} show>
         <Modal.Header>
           <Modal.Title>Parsing your G-code...</Modal.Title>
         </Modal.Header>
@@ -100,10 +100,10 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
     (consumedFilamentMass / spool.netWeight) * spool.purchaseCost;
 
   return (
-    <Modal onHide={onHide} show={true}>
+    <Modal onHide={onHide} show>
       <Form>
         <Modal.Header closeButton>
-          <Modal.Title>Print from {spool?.name}</Modal.Title>
+          <Modal.Title>Print using {spool?.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group>
@@ -149,21 +149,42 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
             </Form.Control.Feedback>
           </Form.Group>
           {remainingFilamentLength > 0 ? (
-            <Alert className="mt-2" variant="info">
-              <p>
-                This print will consume {consumedFilamentLength.toFixed(2)}{' '}
-                meters of filament, leaving this much of the spool:
-              </p>
-              <ProgressBar
-                label={`${Math.round(remainingFilamentPercent)}%`}
-                now={remainingFilamentPercent}
-              />
-              <p>The cost of the filament is {filamentCost.toFixed(2)}.</p>
-            </Alert>
+            <Card bg="info" body className="mt-3 mb-0" text="light">
+              <h1>Usage Info</h1>
+              <Container fluid>
+                <Row>
+                  <Col md={3} sm={12}>
+                    Meters:
+                  </Col>
+                  <Col md={9} sm={12}>
+                    {consumedFilamentLength.toFixed(2)}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={3} sm={12}>
+                    Cost:
+                  </Col>
+                  <Col md={3} sm={12}>
+                    {filamentCost.toFixed(2)}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={3} sm={12}>
+                    Remaining:
+                  </Col>
+                  <Col md={9} sm={12}>
+                    <ProgressBar
+                      label={`${Math.round(remainingFilamentPercent)}%`}
+                      now={remainingFilamentPercent}
+                    />
+                  </Col>
+                </Row>
+              </Container>
+            </Card>
           ) : (
-            <Alert className="mt-2" variant="danger">
+            <Card bg="danger" body className="mt-3 mb-0" text="light">
               The spool does not have enough filament remaining for this print!
-            </Alert>
+            </Card>
           )}
         </Modal.Body>
         <Modal.Footer>
