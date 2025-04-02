@@ -79,7 +79,7 @@ export default function SpoolDatabase() {
     purchaseDate: formatISO(new Date()),
     purchaseCost: 0
   };
-  const importRef = useRef();
+  const restoreRef = useRef();
   const [selectedId, setSelectedId] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showPrintForm, setShowPrintForm] = useState(false);
@@ -165,11 +165,11 @@ export default function SpoolDatabase() {
     },
     [findSpool, updateSpool, selectedId]
   );
-  const handleImport = useCallback(() => {
-    if (importRef.current) {
-      importRef.current.click();
+  const handleRestore = useCallback(() => {
+    if (restoreRef.current) {
+      restoreRef.current.click();
     }
-  }, [importRef]);
+  }, [restoreRef]);
   const handleImportSubmit = useCallback(
     (event) => {
       const {
@@ -199,11 +199,11 @@ export default function SpoolDatabase() {
     },
     [setSelectedId, setSpools]
   );
-  const handleExport = useCallback(
+  const handleBackup = useCallback(
     () =>
       fileDownload(
         JSON.stringify(spools),
-        `filacalc-export-${format(Date.now(), 'yyyy-MM-dd')}.json`
+        `filacalc-backup-${format(Date.now(), 'yyyy-MM-dd')}.json`
       ),
     [spools]
   );
@@ -297,19 +297,19 @@ export default function SpoolDatabase() {
           <input
             className="d-none"
             onChange={handleImportSubmit}
-            ref={importRef}
+            ref={restoreRef}
             type="file"
           />
           <ButtonGroup>
-            <Button onClick={handleImport}>
-              <FontAwesomeIcon icon={faUpload} /> Import
+            <Button onClick={handleRestore}>
+              <FontAwesomeIcon icon={faUpload} /> Restore
             </Button>
-            <Button onClick={handleExport}>
-              <FontAwesomeIcon icon={faDownload} /> Export
+            <Button onClick={handleBackup}>
+              <FontAwesomeIcon icon={faDownload} /> Backup
             </Button>
             {showAddTd1Button && (
               <Button onClick={handleAddTd1}>
-                <FontAwesomeIcon icon={faLightbulb} /> Add TD-1
+                <FontAwesomeIcon icon={faLightbulb} /> Connect TD-1
               </Button>
             )}
           </ButtonGroup>
@@ -336,7 +336,7 @@ export default function SpoolDatabase() {
         </ButtonGroup>
         <ButtonGroup className="ms-auto">
           <Button disabled={!selectedId} onClick={handlePrint}>
-            <FontAwesomeIcon icon={faPrint} /> Print
+            <FontAwesomeIcon icon={faPrint} /> Print using spool
           </Button>
         </ButtonGroup>
       </div>
@@ -407,14 +407,19 @@ export default function SpoolDatabase() {
                     ((spool.purchaseCost / spool.netWeight) * 1e3).toFixed(2)}
                 </td>
                 <td className={colRightClasses}>
-                  <ProgressBar
-                    className="text-light"
-                    label={`${Math.floor(
-                      (remainingMass / spool.netWeight) * 1e2
-                    )}%`}
-                    now={(remainingMass / spool.netWeight) * 1e2}
-                    variant="info"
-                  />
+                  <div
+                    className="d-flex align-items-center"
+                    style={{ height: 24 }}
+                  >
+                    <ProgressBar
+                      className="flex-grow-1 text-light"
+                      label={`${Math.floor(
+                        (remainingMass / spool.netWeight) * 1e2
+                      )}%`}
+                      now={(remainingMass / spool.netWeight) * 1e2}
+                      variant="info"
+                    />
+                  </div>
                 </td>
                 <td className={colRightClasses}>
                   {remainingMass.toFixed(2)} g

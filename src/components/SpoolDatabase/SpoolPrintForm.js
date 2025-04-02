@@ -172,8 +172,9 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
                   <Col md={3} sm={12}>
                     Remaining:
                   </Col>
-                  <Col md={9} sm={12}>
+                  <Col className="d-flex align-items-center" md={9} sm={12}>
                     <ProgressBar
+                      className="flex-grow-1"
                       label={`${Math.round(remainingFilamentPercent)}%`}
                       now={remainingFilamentPercent}
                     />
