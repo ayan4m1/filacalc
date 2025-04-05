@@ -72,16 +72,19 @@ export default function SpoolEditForm({
           <Modal.Title>{isSpoolSelected ? 'Edit' : 'Add'} a Spool</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {waiting && (
-            <Container className="mb-2" fluid>
-              <Row>
-                <Col className="d-flex justify-content-center">
-                  <h1 className="flex-grow-1">Insert filament...</h1>
-                  <FontAwesomeIcon icon={faSpinner} size="3x" spin />
-                </Col>
-              </Row>
-            </Container>
-          )}
+          <Form.Group>
+            <Form.Label>Vendor</Form.Label>
+            <Form.Control
+              isInvalid={Boolean(errors.vendor)}
+              name="vendor"
+              onChange={handleChange}
+              type="text"
+              value={values.vendor}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.vendor}
+            </Form.Control.Feedback>
+          </Form.Group>
           <Form.Group>
             <Form.Label>Spool Name</Form.Label>
             <Form.Control

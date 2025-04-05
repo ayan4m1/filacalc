@@ -14,7 +14,14 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import fileDownload from 'js-file-download';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { getContrastingColor } from 'react-color/lib/helpers/color';
 import {
   Badge,
@@ -35,8 +42,10 @@ import { useSettingsContext } from 'hooks/useSettingsContext';
 import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
 import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
 import { getRemainingFilament, supportsWebSerial } from 'utils';
+import SortIcon from 'components/SortIcon';
 
 const SpoolSchema = Yup.object({
+  vendor: Yup.string().required('Vendor must be provided.'),
   name: Yup.string().required('Name must be provided.'),
   material: Yup.string().required('Material must be provided.'),
   materialDensity: Yup.number().moreThan(
@@ -67,6 +76,7 @@ export default function SpoolDatabase() {
   const [serialPort, setSerialPort] = useState(null);
   const { filamentDiameter } = useSettingsContext();
   const initialValues = {
+    vendor: 'Generic',
     name: 'Spool',
     material: 'PLA',
     materialDensity: 1.24,
@@ -87,6 +97,27 @@ export default function SpoolDatabase() {
   const [totalRemaining, setTotalRemaining] = useState(0);
   const { spools, findSpool, addSpool, updateSpool, removeSpool, setSpools } =
     useSettingsContext();
+  const [sortField, setSortField] = useState('name');
+  const [sortDirection, setSortDirection] = useState(true);
+  const sortedSpools = useMemo(() => {
+    const newArray = [...spools];
+
+    newArray.sort((a, b) => {
+      switch (sortField) {
+        case 'costPerKg':
+        case 'currentWeight':
+          return sortDirection
+            ? a.purchaseCost - b.purchaseCost
+            : b.purchaseCost - a.purchaseCost;
+        default:
+          return sortDirection
+            ? a[sortField]?.localeCompare(b[sortField])
+            : b[sortField]?.localeCompare(a[sortField]);
+      }
+    });
+
+    return newArray;
+  }, [spools, sortField, sortDirection]);
 
   const form = useFormik({
     initialValues,
@@ -217,6 +248,10 @@ export default function SpoolDatabase() {
     (id) => setSelectedId((selId) => (selId === id ? null : id)),
     []
   );
+  const setSortInfo = useCallback((field, direction) => {
+    setSortField(field);
+    setSortDirection(direction);
+  }, []);
   const handleAddTd1 = async () => {
     try {
       const grantedPort = await navigator.serial.requestPort({
@@ -345,15 +380,27 @@ export default function SpoolDatabase() {
           <tr>
             <th colSpan={5}></th>
             <th className="text-center" colSpan={3}>
-              Remaining
+              Remaining{' '}
+              <SortIcon column="currentWeight" onToggle={setSortInfo} />
             </th>
           </tr>
           <tr>
-            <th style={{ width: '30%' }}>Name</th>
-            <th>Material</th>
-            <th>Purchased</th>
-            <th className="text-end">Net Weight</th>
-            <th className="text-end">Cost / kg</th>
+            <th style={{ width: '30%' }}>
+              Name <SortIcon column="name" onToggle={setSortInfo} />
+            </th>
+            <th>
+              Material <SortIcon column="material" onToggle={setSortInfo} />
+            </th>
+            <th>
+              Purchased{' '}
+              <SortIcon column="purchaseDate" onToggle={setSortInfo} />
+            </th>
+            <th className="text-end">
+              Net Weight <SortIcon column="netWeight" onToggle={setSortInfo} />
+            </th>
+            <th className="text-end">
+              Cost / kg <SortIcon column="costPerKg" onToggle={setSortInfo} />
+            </th>
             <th className="text-center" style={{ width: '20%' }}>
               %
             </th>
@@ -369,7 +416,7 @@ export default function SpoolDatabase() {
               </td>
             </tr>
           )}
-          {spools?.map?.((spool) => {
+          {sortedSpools?.map?.((spool) => {
             const { mass: remainingMass, length: remainingLength } =
               getRemainingFilament(spool);
             const purchaseDate = format(
@@ -396,7 +443,7 @@ export default function SpoolDatabase() {
                       boxShadow: '2px 2px 4px #262323'
                     }}
                   >
-                    {spool.name}
+                    {spool.vendor} {spool.name}
                   </Badge>
                 </td>
                 <td className={colClasses}>{material}</td>

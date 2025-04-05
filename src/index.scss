@@ -3,6 +3,9 @@
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/solar/bootswatch";
 
+// Component styles
+@import "./components/SortIcon";
+
 // Fix progress bar always having primary color text labels
 .progress > .progress-bar {
   color: unset;
