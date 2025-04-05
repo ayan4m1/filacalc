@@ -22,20 +22,18 @@ import {
   Tooltip
 } from 'react-bootstrap';
 
-import useTd1Serial from 'hooks/useTd1Serial';
 import { materials, supportsWebSerial } from 'utils';
 
 export default function SpoolEditForm({
   isSpoolSelected,
   form: { errors, values, handleChange, handleSubmit, setFieldValue },
   onHide,
-  serialPort
+  serialPort,
+  readData,
+  close,
+  waiting
 }) {
   const [connected, setConnected] = useState(false);
-  const { waiting, connect, disconnect } = useTd1Serial({
-    serialPort,
-    setFieldValue
-  });
   const handleDateChange = useCallback(
     (date) => setFieldValue('purchaseDate', formatISO(date)),
     [setFieldValue]
@@ -44,26 +42,29 @@ export default function SpoolEditForm({
     (color) => setFieldValue('color', color.hex),
     [setFieldValue]
   );
-  const handleFetchClick = useCallback(() => {
+  const handleFetchClick = useCallback(async () => {
     if (connected) {
-      disconnect();
+      close();
     } else {
-      connect();
+      const { transmissionDistance, color } = await readData();
+
+      setFieldValue('transmissionDistance', transmissionDistance);
+      setFieldValue('color', color);
     }
 
     setConnected((val) => !val);
-  }, [connect, disconnect, connected]);
+  }, [readData, close, connected, setFieldValue]);
 
   useEffect(() => {
     return async () => {
       try {
-        await disconnect();
+        await close();
       } catch (error) {
         console.error(error);
         console.log('Failed to close serial port!');
       }
     };
-  }, [disconnect]);
+  }, [close]);
 
   return (
     <Modal onHide={onHide} show={true}>
@@ -332,5 +333,8 @@ SpoolEditForm.propTypes = {
     handleSubmit: PropTypes.func.isRequired
   }).isRequired,
   onHide: PropTypes.func.isRequired,
-  serialPort: PropTypes.object
+  serialPort: PropTypes.object,
+  readData: PropTypes.func.isRequired,
+  close: PropTypes.func.isRequired,
+  waiting: PropTypes.bool.isRequired
 };

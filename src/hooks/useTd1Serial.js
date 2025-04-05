@@ -1,13 +1,14 @@
-import { useCallback, useState } from 'react';
-import { getAsciiBytes, getAsciiString } from 'utils';
+import { useCallback, useEffect, useState } from 'react';
+import { getAsciiBytes, getAsciiString, supportsWebSerial } from 'utils';
 
-export default function useTd1Serial({ serialPort, setFieldValue }) {
+export default function useTd1Serial() {
+  const [serialPort, setSerialPort] = useState(null);
   const [dataStreams, setDataStreams] = useState({
     reader: null,
     writer: null
   });
   const [waiting, setWaiting] = useState(false);
-  const connect = useCallback(async () => {
+  const readData = useCallback(async () => {
     if (!serialPort || waiting) {
       return;
     }
@@ -80,11 +81,13 @@ export default function useTd1Serial({ serialPort, setFieldValue }) {
         }
       }
 
-      const [, , , , td, color] = filamentData.split(',');
+      const [, , , , transmissionDistance, color] = filamentData.split(',');
 
       setWaiting(false);
-      setFieldValue('transmissionDistance', td);
-      setFieldValue('color', `#${color}`);
+      return {
+        transmissionDistance,
+        color: `#${color}`
+      };
     } catch (error) {
       console.error(error);
     } finally {
@@ -96,8 +99,8 @@ export default function useTd1Serial({ serialPort, setFieldValue }) {
         console.log('Failed to close serial port!');
       }
     }
-  }, [serialPort, setFieldValue, waiting]);
-  const disconnect = useCallback(async () => {
+  }, [serialPort, waiting]);
+  const close = useCallback(async () => {
     if (!serialPort) {
       return;
     }
@@ -107,10 +110,41 @@ export default function useTd1Serial({ serialPort, setFieldValue }) {
     await serialPort.close();
     setWaiting(false);
   }, [serialPort, dataStreams]);
+  const connect = useCallback(async () => {
+    try {
+      const grantedPort = await navigator.serial.requestPort({
+        filters: [{ usbVendorId: 0xe4b2, usbProductId: 0x0045 }]
+      });
+
+      if (grantedPort) {
+        setSerialPort(grantedPort);
+      }
+    } catch (error) {
+      if (!error.message.includes('No port selected')) {
+        alert(error.message);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const enumerateSerialPorts = async () => {
+      const existingPorts = await navigator.serial.getPorts();
+
+      if (existingPorts.length) {
+        setSerialPort(existingPorts[0]);
+      }
+    };
+
+    if (supportsWebSerial) {
+      enumerateSerialPorts();
+    }
+  }, []);
 
   return {
     connect,
-    disconnect,
-    waiting
+    readData,
+    close,
+    waiting,
+    serialPort
   };
 }

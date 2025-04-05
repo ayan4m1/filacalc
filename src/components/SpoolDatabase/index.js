@@ -43,6 +43,7 @@ import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
 import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
 import { getRemainingFilament, supportsWebSerial } from 'utils';
 import SortIcon from 'components/SortIcon';
+import useTd1Serial from 'hooks/useTd1Serial';
 
 const SpoolSchema = Yup.object({
   vendor: Yup.string().required('Vendor must be provided.'),
@@ -72,8 +73,6 @@ const SpoolSchema = Yup.object({
 });
 
 export default function SpoolDatabase() {
-  const [showAddTd1Button, setShowAddTd1Button] = useState(supportsWebSerial);
-  const [serialPort, setSerialPort] = useState(null);
   const { filamentDiameter } = useSettingsContext();
   const initialValues = {
     vendor: 'Generic',
@@ -89,6 +88,7 @@ export default function SpoolDatabase() {
     purchaseDate: formatISO(new Date()),
     purchaseCost: 0
   };
+  const { serialPort, connect, readData, close, waiting } = useTd1Serial();
   const restoreRef = useRef();
   const [selectedId, setSelectedId] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -252,22 +252,6 @@ export default function SpoolDatabase() {
     setSortField(field);
     setSortDirection(direction);
   }, []);
-  const handleAddTd1 = async () => {
-    try {
-      const grantedPort = await navigator.serial.requestPort({
-        filters: [{ usbVendorId: 0xe4b2, usbProductId: 0x0045 }]
-      });
-
-      if (grantedPort) {
-        setShowAddTd1Button(false);
-        setSerialPort(grantedPort);
-      }
-    } catch (error) {
-      if (!error.message.includes('No port selected')) {
-        alert(error.message);
-      }
-    }
-  };
 
   useEffect(() => {
     setTotalWeight(spools.reduce((prev, curr) => prev + curr.netWeight, 0));
@@ -279,30 +263,18 @@ export default function SpoolDatabase() {
     );
   }, [spools]);
 
-  useEffect(() => {
-    const enumerateSerialPorts = async () => {
-      const existingPorts = await navigator.serial.getPorts();
-
-      if (existingPorts.length) {
-        setShowAddTd1Button(false);
-        setSerialPort(existingPorts[0]);
-      }
-    };
-
-    if (supportsWebSerial) {
-      enumerateSerialPorts();
-    }
-  }, []);
-
   return (
     <Fragment>
       <Helmet title="Spool Database" />
       {showEditForm && (
         <SpoolEditForm
+          close={close}
           form={form}
           isSpoolSelected={Boolean(selectedId)}
           onHide={hideForm}
+          readData={readData}
           serialPort={serialPort}
+          waiting={waiting}
         />
       )}
       {selectedId && showPrintForm && (
@@ -342,9 +314,9 @@ export default function SpoolDatabase() {
             <Button onClick={handleBackup}>
               <FontAwesomeIcon icon={faDownload} /> Backup
             </Button>
-            {showAddTd1Button && (
-              <Button onClick={handleAddTd1}>
-                <FontAwesomeIcon icon={faLightbulb} /> Connect TD-1
+            {!serialPort && supportsWebSerial && (
+              <Button onClick={connect}>
+                <FontAwesomeIcon icon={faLightbulb} /> Add TD-1
               </Button>
             )}
           </ButtonGroup>
