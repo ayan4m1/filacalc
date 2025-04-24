@@ -30,7 +30,7 @@
     "react-datepicker": "8.2.1",
     "react-dom": "^19.1.0",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "6.30.0",
+    "react-router-dom": "7.5.2",
     "use-local-storage-state": "^19.5.0",
     "uuid": "^11.1.0",
     "yup": "^1.6.1"
