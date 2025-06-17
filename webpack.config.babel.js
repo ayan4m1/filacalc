@@ -33,8 +33,7 @@ if (dev) {
       quiet: false
     }),
     new ESLintPlugin({
-      configType: 'flat',
-      eslintPath: 'eslint/use-at-your-own-risk'
+      configType: 'flat'
     })
   );
 }

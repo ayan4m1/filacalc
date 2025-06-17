@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import { Fragment } from 'react';
 import { Card, Alert, Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
 
 export const Calculator = ({ children }) => <Fragment>{children}</Fragment>;
 
@@ -11,7 +10,7 @@ const Description = ({ children }) =>
 
 const Heading = ({ title, icon, children }) => (
   <Fragment>
-    {Boolean(title) && <Helmet title={title} />}
+    {Boolean(title) && <title>Filacalc - {title}</title>}
     <h1>
       {Boolean(icon) && <FontAwesomeIcon icon={icon} size="2x" />}
       {Boolean(title) && ` ${title}`}

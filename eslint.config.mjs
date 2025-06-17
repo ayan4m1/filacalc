@@ -2,14 +2,14 @@ import js from '@eslint/js';
 import globals from 'globals';
 import reactPlugin from 'eslint-plugin-react';
 import babelParser from '@babel/eslint-parser';
-import importPlugin from 'eslint-plugin-import-x';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
+import { flatConfigs as importConfig } from 'eslint-plugin-import-x';
 
 export default [
   js.configs.recommended,
-  importPlugin.flatConfigs.recommended,
-  importPlugin.flatConfigs.react,
+  importConfig.recommended,
+  importConfig.react,
   {
     plugins: {
       react: reactPlugin,
@@ -27,7 +27,13 @@ export default [
       ...reactHooksPlugin.configs.recommended.rules,
       'react/jsx-uses-react': 0,
       'react/jsx-sort-props': 2,
-      'react/react-in-jsx-scope': 0
+      'react/react-in-jsx-scope': 0,
+      'import-x/no-unresolved': [
+        'error',
+        {
+          caseSensitive: false
+        }
+      ]
     },
     settings: {
       react: {

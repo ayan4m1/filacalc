@@ -34,16 +34,15 @@ import {
   Table,
   Tooltip
 } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
 import { v4 } from 'uuid';
 import * as Yup from 'yup';
 
-import { useSettingsContext } from 'hooks/useSettingsContext';
-import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
-import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
-import { getRemainingFilament, supportsWebSerial } from 'utils';
 import SortIcon from 'components/SortIcon';
 import useTd1Serial from 'hooks/useTd1Serial';
+import { useSettingsContext } from 'hooks/useSettingsContext';
+import { getRemainingFilament, supportsWebSerial } from 'utils';
+import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
+import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
 
 const SpoolSchema = Yup.object({
   vendor: Yup.string().required('Vendor must be provided.'),
@@ -265,7 +264,7 @@ export default function SpoolDatabase() {
 
   return (
     <Fragment>
-      <Helmet title="Spool Database" />
+      <title>Filacalc - Spool Database</title>
       {showEditForm && (
         <SpoolEditForm
           close={close}

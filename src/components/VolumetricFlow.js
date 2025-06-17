@@ -1,9 +1,8 @@
 import { useFormik } from 'formik';
-import { useSettingsContext } from 'hooks/useSettingsContext';
 import { Fragment, useCallback } from 'react';
 import { Button, Form, Dropdown } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
 
+import { useSettingsContext } from 'hooks/useSettingsContext';
 import { getHotend, getNozzle, hotends, nozzles } from 'utils';
 
 export default function VolumetricFlow() {
@@ -88,7 +87,7 @@ export default function VolumetricFlow() {
 
   return (
     <Fragment>
-      <Helmet title="Volumetric Flow Optimization" />
+      <title>Filacalc - Volumetric Flow Optimization</title>
       <h1>Volumetric Flow Optimization</h1>
       <Form onSubmit={handleSubmit}>
         <h3>Hotend</h3>
