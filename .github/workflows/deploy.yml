@@ -50,6 +50,9 @@ jobs:
             echo "Unable to determine packager manager"
             exit 1
           fi
+      - name: Setup Yarn
+        run: |
+          corepack enable
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -68,10 +71,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gatsby-build-
       - name: Install dependencies
-        run: |
-          corepack enable
-          yarn set version stable
-          ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Build
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
       - name: Upload artifact
