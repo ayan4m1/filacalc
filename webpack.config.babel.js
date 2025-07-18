@@ -129,5 +129,6 @@ export default {
         }
       }
     }
-  }
+  },
+  ignoreWarnings: [/@import rules/]
 };
