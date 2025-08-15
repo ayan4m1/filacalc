@@ -56,15 +56,12 @@ export default function useTd1Serial() {
       });
 
       await writer.write(getAsciiBytes('connect\n'));
-
       await readUntil(reader, (msg) => msg === 'ready');
-
       await writer.write(getAsciiBytes('P\n'));
 
       let filamentData = '';
 
       setWaiting(true);
-
       await readUntil(reader, (msg) => msg.endsWith('licensed'));
 
       filamentData = await readUntil(
@@ -75,6 +72,7 @@ export default function useTd1Serial() {
       const [, , , , transmissionDistance, color] = filamentData.split(',');
 
       setWaiting(false);
+
       return {
         transmissionDistance,
         color: `#${color}`
