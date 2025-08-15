@@ -115,7 +115,10 @@ export default function useTd1Serial() {
   const connect = useCallback(async () => {
     try {
       const grantedPort = await navigator.serial.requestPort({
-        filters: [{ usbVendorId: 0xe4b2, usbProductId: 0x0045 }]
+        filters: [
+          { usbVendorId: 0xe4b2, usbProductId: 0x0045 }, // td-1
+          { usbVendorId: 0xe4b2, usbProductId: 0x0044 } // td-0
+        ]
       });
 
       if (grantedPort) {
