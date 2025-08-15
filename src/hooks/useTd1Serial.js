@@ -10,7 +10,7 @@ export default function useTd1Serial() {
   const [waiting, setWaiting] = useState(false);
   const readData = useCallback(async () => {
     if (!serialPort || waiting) {
-      return;
+      return {};
     }
 
     let reader = null,
@@ -99,6 +99,8 @@ export default function useTd1Serial() {
         console.log('Failed to close serial port!');
       }
     }
+
+    return {};
   }, [serialPort, waiting]);
   const close = useCallback(async () => {
     if (!serialPort) {
