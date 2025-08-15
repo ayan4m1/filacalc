@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Fragment, useCallback, useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
+import { DatePicker } from 'react-datepicker';
 import { SketchPicker } from 'react-color';
 import { parseISO, formatISO } from 'date-fns';
 import {
