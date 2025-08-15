@@ -1,6 +1,34 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getAsciiBytes, getAsciiString, supportsWebSerial } from 'utils';
 
+const readUntil = async (reader, isEnd) => {
+  let result = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+
+    if (done) {
+      // if device is sending screen mirroring commands, ignore and restart
+      if (result === 'clearScreen' || result.startsWith('display')) {
+        result = '';
+        continue;
+      }
+
+      break;
+    } else {
+      result += getAsciiString(value).trim();
+
+      const end = isEnd(result);
+
+      if (end) {
+        break;
+      }
+    }
+  }
+
+  return result;
+};
+
 export default function useTd1Serial() {
   const [serialPort, setSerialPort] = useState(null);
   const [dataStreams, setDataStreams] = useState({
@@ -29,68 +57,20 @@ export default function useTd1Serial() {
 
       await writer.write(getAsciiBytes('connect\n'));
 
-      let tempBuffer = '';
-
-      while (true) {
-        const { value, done } = await reader.read();
-
-        if (done) {
-          break;
-        } else {
-          tempBuffer += getAsciiString(value).trim();
-
-          if (tempBuffer === 'ready') {
-            break;
-          }
-        }
-      }
+      await readUntil(reader, (msg) => msg === 'ready');
 
       await writer.write(getAsciiBytes('P\n'));
 
-      setWaiting(true);
-
       let filamentData = '';
 
-      while (true) {
-        const { value, done } = await reader.read();
+      setWaiting(true);
 
-        if (done) {
-          break;
-        } else {
-          filamentData += getAsciiString(value).trim();
+      await readUntil(reader, (msg) => msg.endsWith('licensed'));
 
-          // todo: handle else case where they are not licensed
-          if (filamentData.endsWith('licensed')) {
-            break;
-          }
-        }
-      }
-
-      filamentData = '';
-
-      while (true) {
-        const { value, done } = await reader.read();
-
-        if (done) {
-          // if device is sending screen mirroring commands, ignore and restart
-          if (
-            filamentData === 'clearScreen' ||
-            filamentData.startsWith('display')
-          ) {
-            filamentData = '';
-            continue;
-          }
-
-          break;
-        } else {
-          filamentData += getAsciiString(value).trim();
-
-          // break out of the loop if we got a complete measurement
-          if (filamentData.lastIndexOf(',') == filamentData.length - 7) {
-            break;
-          }
-        }
-      }
+      filamentData = await readUntil(
+        reader,
+        (msg) => msg.lastIndexOf(',') == msg.length - 7
+      );
 
       const [, , , , transmissionDistance, color] = filamentData.split(',');
 
