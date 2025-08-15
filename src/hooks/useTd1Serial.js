@@ -59,6 +59,7 @@ export default function useTd1Serial() {
         } else {
           filamentData += getAsciiString(value).trim();
 
+          // todo: handle else case where they are not licensed
           if (filamentData.endsWith('licensed')) {
             break;
           }
@@ -71,10 +72,20 @@ export default function useTd1Serial() {
         const { value, done } = await reader.read();
 
         if (done) {
+          // if device is sending screen mirroring commands, ignore and restart
+          if (
+            filamentData === 'clearScreen' ||
+            filamentData.startsWith('display')
+          ) {
+            filamentData = '';
+            continue;
+          }
+
           break;
         } else {
           filamentData += getAsciiString(value).trim();
 
+          // break out of the loop if we got a complete measurement
           if (filamentData.lastIndexOf(',') == filamentData.length - 7) {
             break;
           }
