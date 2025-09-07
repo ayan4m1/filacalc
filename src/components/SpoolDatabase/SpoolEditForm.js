@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
-import { Fragment, useCallback, useEffect, useState } from 'react';
 import { DatePicker } from 'react-datepicker';
 import { SketchPicker } from 'react-color';
 import { parseISO, formatISO } from 'date-fns';
+import { Fragment, useCallback, useState } from 'react';
 import {
   faDownload,
   faInfoCircle,
@@ -54,20 +54,18 @@ export default function SpoolEditForm({
 
     setConnected((val) => !val);
   }, [readData, close, connected, setFieldValue]);
-
-  useEffect(() => {
-    return async () => {
-      try {
-        await close();
-      } catch (error) {
-        console.error(error);
-        console.log('Failed to close serial port!');
-      }
-    };
-  }, [close]);
+  const closeOnHide = useCallback(async () => {
+    try {
+      await close();
+    } catch (error) {
+      console.error(error);
+      console.warn('Failed to close serial port!');
+    }
+    onHide();
+  }, [onHide, close]);
 
   return (
-    <Modal onHide={onHide} show={true}>
+    <Modal onHide={closeOnHide} show={true}>
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
           <Modal.Title>{isSpoolSelected ? 'Edit' : 'Add'} a Spool</Modal.Title>

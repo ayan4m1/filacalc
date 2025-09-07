@@ -7,16 +7,18 @@ const readUntil = async (reader, isEnd) => {
   while (true) {
     const { value, done } = await reader.read();
 
-    if (done) {
-      // if device is sending screen mirroring commands, ignore and restart
-      if (result === 'clearScreen' || result.startsWith('display')) {
-        result = '';
-        continue;
-      }
+    const parsed = getAsciiString(value).trim();
 
+    // if device is sending screen mirroring commands, ignore and restart
+    if (parsed === 'clearScreen' || parsed.startsWith('display')) {
+      result = '';
+      continue;
+    }
+
+    if (done) {
       break;
     } else {
-      result += getAsciiString(value).trim();
+      result += parsed;
 
       const end = isEnd(result);
 
@@ -54,7 +56,6 @@ export default function useTd1Serial() {
         reader,
         writer
       });
-
       await writer.write(getAsciiBytes('connect\n'));
       await readUntil(reader, (msg) => msg === 'ready');
       await writer.write(getAsciiBytes('P\n'));
@@ -63,10 +64,9 @@ export default function useTd1Serial() {
 
       setWaiting(true);
       await readUntil(reader, (msg) => msg.endsWith('licensed'));
-
       filamentData = await readUntil(
         reader,
-        (msg) => msg.lastIndexOf(',') == msg.length - 7
+        (msg) => msg.lastIndexOf(',') === msg.length - 7
       );
 
       const [, , , , transmissionDistance, color] = filamentData.split(',');
@@ -125,7 +125,11 @@ export default function useTd1Serial() {
       const existingPorts = await navigator.serial.getPorts();
 
       if (existingPorts.length) {
-        setSerialPort(existingPorts[0]);
+        const [port] = existingPorts;
+
+        // if (port.connected) {
+        setSerialPort(port);
+        // }
       }
     };
 
