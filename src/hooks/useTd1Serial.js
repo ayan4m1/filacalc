@@ -127,9 +127,9 @@ export default function useTd1Serial() {
       if (existingPorts.length) {
         const [port] = existingPorts;
 
-        // if (port.connected) {
-        setSerialPort(port);
-        // }
+        if (port.connected) {
+          setSerialPort(port);
+        }
       }
     };
 
