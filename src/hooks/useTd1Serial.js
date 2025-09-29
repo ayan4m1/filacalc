@@ -9,16 +9,18 @@ const readUntil = async (reader, isEnd) => {
 
     const parsed = getAsciiString(value).trim();
 
-    // if device is sending screen mirroring commands, ignore and restart
-    if (parsed === 'clearScreen' || parsed.startsWith('display')) {
-      result = '';
-      continue;
-    }
-
     if (done) {
       break;
     } else {
       result += parsed;
+
+      // if device is sending screen mirroring commands, ignore and restart
+      if (result.includes('clearScreen') || result.includes('display,')) {
+        result = '';
+        continue;
+      }
+
+      console.dir(result);
 
       const end = isEnd(result);
 
@@ -67,7 +69,9 @@ export default function useTd1Serial() {
       await readUntil(reader, (msg) => msg.endsWith('licensed'));
       filamentData = await readUntil(
         reader,
-        (msg) => msg.lastIndexOf(',') === msg.length - 7
+        (msg) =>
+          msg.lastIndexOf(',') === msg.length - 1 || // td-0
+          msg.lastIndexOf(',') === msg.length - 7 // td-1
       );
 
       const [, , , , transmissionDistance, color] = filamentData.split(',');
@@ -76,7 +80,7 @@ export default function useTd1Serial() {
 
       return {
         transmissionDistance,
-        color: `#${color}`
+        color: color ? `#${color}` : '#000000'
       };
     } catch (error) {
       console.error(error);
