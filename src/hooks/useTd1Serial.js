@@ -33,6 +33,7 @@ const readUntil = async (reader, isEnd) => {
 
 export default function useTd1Serial() {
   const [serialPort, setSerialPort] = useState(null);
+  const [portClosed, setPortClosed] = useState(false);
   const [dataStreams, setDataStreams] = useState({
     reader: null,
     writer: null
@@ -84,6 +85,7 @@ export default function useTd1Serial() {
         reader?.releaseLock?.();
         writer?.releaseLock?.();
         await serialPort.close();
+        setPortClosed(true);
       } catch {
         console.log('Failed to close serial port!');
       }
@@ -92,15 +94,16 @@ export default function useTd1Serial() {
     return {};
   }, [serialPort, waiting]);
   const close = useCallback(async () => {
-    if (!serialPort) {
+    if (!serialPort || portClosed) {
       return;
     }
 
     dataStreams.reader?.releaseLock?.();
     dataStreams.writer?.releaseLock?.();
     await serialPort.close();
+    setPortClosed(true);
     setWaiting(false);
-  }, [serialPort, dataStreams]);
+  }, [portClosed, serialPort, dataStreams]);
   const connect = useCallback(async () => {
     try {
       const grantedPort = await navigator.serial.requestPort({

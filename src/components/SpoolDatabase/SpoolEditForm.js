@@ -45,6 +45,7 @@ export default function SpoolEditForm({
   const handleFetchClick = useCallback(async () => {
     if (connected) {
       close();
+      setConnected(false);
     } else {
       const { transmissionDistance, color } = await readData();
 
@@ -57,6 +58,7 @@ export default function SpoolEditForm({
   const closeOnHide = useCallback(async () => {
     try {
       await close();
+      setConnected(false);
     } catch (error) {
       console.error(error);
       console.warn('Failed to close serial port!');
