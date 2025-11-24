@@ -10,7 +10,7 @@ const Description = ({ children }) =>
 
 const Heading = ({ title, icon, children }) => (
   <Fragment>
-    {Boolean(title) && <title>Filacalc - {title}</title>}
+    {Boolean(title) && <title>{`Filacalc - ${title}`}</title>}
     <h1>
       {Boolean(icon) && <FontAwesomeIcon icon={icon} size="2x" />}
       {Boolean(title) && ` ${title}`}

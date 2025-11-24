@@ -87,7 +87,7 @@ export default function VolumetricFlow() {
 
   return (
     <Fragment>
-      <title>Filacalc - Volumetric Flow Optimization</title>
+      <title>{`Filacalc - Volumetric Flow Optimization`}</title>
       <h1>Volumetric Flow Optimization</h1>
       <Form onSubmit={handleSubmit}>
         <h3>Hotend</h3>

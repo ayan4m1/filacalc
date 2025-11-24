@@ -14,14 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import fileDownload from 'js-file-download';
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import { getContrastingColor } from 'react-color/lib/helpers/color';
 import {
   Badge,
@@ -92,10 +85,20 @@ export default function SpoolDatabase() {
   const [selectedId, setSelectedId] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showPrintForm, setShowPrintForm] = useState(false);
-  const [totalWeight, setTotalWeight] = useState(0);
-  const [totalRemaining, setTotalRemaining] = useState(0);
   const { spools, findSpool, addSpool, updateSpool, removeSpool, setSpools } =
     useSettingsContext();
+  const totalWeight = useMemo(
+    () => spools.reduce((prev, curr) => prev + curr?.netWeight, 0),
+    [spools]
+  );
+  const totalRemaining = useMemo(
+    () =>
+      spools.reduce(
+        (prev, curr) => prev + (curr.currentWeight - curr.spoolWeight),
+        0
+      ),
+    [spools]
+  );
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState(true);
   const sortedSpools = useMemo(() => {
@@ -252,19 +255,9 @@ export default function SpoolDatabase() {
     setSortDirection(direction);
   }, []);
 
-  useEffect(() => {
-    setTotalWeight(spools.reduce((prev, curr) => prev + curr.netWeight, 0));
-    setTotalRemaining(
-      spools.reduce(
-        (prev, curr) => prev + (curr.currentWeight - curr.spoolWeight),
-        0
-      )
-    );
-  }, [spools]);
-
   return (
     <Fragment>
-      <title>Filacalc - Spool Database</title>
+      <title>{`Filacalc - Spool Database`}</title>
       {showEditForm && (
         <SpoolEditForm
           close={close}
