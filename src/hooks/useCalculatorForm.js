@@ -15,6 +15,7 @@ export default function useCalculatorForm({
 
   useEffect(() => {
     if (!shouldShow(values, touched)) {
+      // eslint-disable-next-line
       setErrors([]);
       setResults(null);
       return;

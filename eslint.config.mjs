@@ -6,14 +6,18 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
 import { flatConfigs as importConfig } from 'eslint-plugin-import-x';
 
+const { configs: reactConfig } = reactPlugin;
+const { configs: hooksConfig } = reactHooksPlugin;
+
 export default [
   js.configs.recommended,
   importConfig.recommended,
   importConfig.react,
+  reactConfig.flat['recommended'],
+  hooksConfig.flat['recommended-latest'],
   {
     plugins: {
-      react: reactPlugin,
-      'react-hooks': reactHooksPlugin
+      react: reactPlugin
     },
     languageOptions: {
       globals: globals.browser,
@@ -23,8 +27,6 @@ export default [
       }
     },
     rules: {
-      ...reactPlugin.configs.recommended.rules,
-      ...reactHooksPlugin.configs.recommended.rules,
       'react/jsx-uses-react': 0,
       'react/jsx-sort-props': 2,
       'react/react-in-jsx-scope': 0,
