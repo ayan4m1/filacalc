@@ -89,7 +89,7 @@ export default function ExtruderCalibration() {
           </ListGroupItem>
         </ListGroup>
       </Calculator.Description>
-      <Form>
+      <Form className="mb-4">
         <Form.Group>
           <Form.Label>Current Steps per mm</Form.Label>
           <Form.Control
