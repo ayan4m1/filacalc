@@ -1,15 +1,17 @@
 import { useCallback } from 'react';
+import { FormikTouched } from 'formik';
 import { Form, ListGroup, ListGroupItem } from 'react-bootstrap';
 
-import { Calculator } from 'components/Calculator';
-import useCalculatorForm from 'hooks/useCalculatorForm';
+import { Calculator } from '../components/Calculator';
+import useCalculatorForm from '../hooks/useCalculatorForm';
+import { ExtruderCalibrationForm } from '../types';
 
 export default function ExtruderCalibration() {
   const {
     formik: { handleBlur, handleChange, values },
     errors,
     results
-  } = useCalculatorForm({
+  } = useCalculatorForm<ExtruderCalibrationForm>({
     initialValues: {
       currentSteps: 100,
       measuredOffset: 0,
@@ -17,10 +19,13 @@ export default function ExtruderCalibration() {
       extrusionPadding: 20
     },
     shouldShow: useCallback(
-      (_, touched) => touched.extrusionLength || touched.measuredOffset,
+      (
+        _: ExtruderCalibrationForm,
+        touched: FormikTouched<ExtruderCalibrationForm>
+      ) => touched.extrusionLength || touched.measuredOffset,
       []
     ),
-    validate: useCallback((vals) => {
+    validate: useCallback((vals: ExtruderCalibrationForm) => {
       const result = [];
 
       if (vals.currentSteps <= 0) {
@@ -40,7 +45,7 @@ export default function ExtruderCalibration() {
 
       return result;
     }, []),
-    calculate: useCallback((vals) => {
+    calculate: useCallback((vals: ExtruderCalibrationForm) => {
       const actualExtrusion =
         vals.extrusionLength + vals.extrusionPadding - vals.measuredOffset;
       const stepsTaken = vals.currentSteps * vals.extrusionLength;

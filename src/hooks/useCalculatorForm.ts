@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 
-export default function useCalculatorForm({
+export default function useCalculatorForm<T>({
   initialValues,
   calculate,
   shouldShow,
@@ -10,7 +10,7 @@ export default function useCalculatorForm({
   const [results, setResults] = useState(null);
   const [errors, setErrors] = useState([]);
 
-  const formik = useFormik({ initialValues });
+  const formik = useFormik<T>({ initialValues, onSubmit: () => {} });
   const { values, touched } = formik;
 
   useEffect(() => {

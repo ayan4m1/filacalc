@@ -1,17 +1,21 @@
-import PropTypes from 'prop-types';
-import { useCallback } from 'react';
+import { ReactNode, useCallback } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 
-import { SettingsContext } from 'hooks/useSettingsContext';
+import { SettingsContext } from '../hooks/useSettingsContext';
+import { Spool } from '../types';
 
-export default function SettingsProvider({ children }) {
+interface IProps {
+  children: ReactNode;
+}
+
+export default function SettingsProvider({ children }: IProps) {
   const [filamentDiameter, setFilamentDiameter] = useLocalStorageState(
     'filamentDiameter',
     {
       defaultValue: 1.75
     }
   );
-  const [spools, setSpools] = useLocalStorageState('spools', {
+  const [spools, setSpools] = useLocalStorageState<Spool[]>('spools', {
     defaultValue: []
   });
 
@@ -66,7 +70,3 @@ export default function SettingsProvider({ children }) {
     </SettingsContext.Provider>
   );
 }
-
-SettingsProvider.propTypes = {
-  children: PropTypes.node.isRequired
-};

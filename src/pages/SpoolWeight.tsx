@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
 import { Form, ProgressBar } from 'react-bootstrap';
 
-import { Calculator } from 'components/Calculator';
-import useCalculatorForm from 'hooks/useCalculatorForm';
-import { useSettingsContext } from 'hooks/useSettingsContext';
-import { getRemainingFilament, getSpool, materials, spools } from 'utils';
+import { Calculator } from '../components/Calculator';
+import useCalculatorForm from '../hooks/useCalculatorForm';
+import { useSettingsContext } from '../hooks/useSettingsContext';
+import { SpoolWeightForm } from '../types';
+import { getRemainingFilament, getSpool, materials, spools } from '../utils';
 
 export default function SpoolWeight() {
   const { filamentDiameter } = useSettingsContext();
@@ -12,7 +13,7 @@ export default function SpoolWeight() {
     formik: { values, handleBlur, handleChange },
     errors,
     results
-  } = useCalculatorForm({
+  } = useCalculatorForm<SpoolWeightForm>({
     initialValues: {
       brand: '',
       material: '',

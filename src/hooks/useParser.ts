@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import parserWorker from 'workers/parser';
-import { createWebWorker } from 'utils';
+import parserWorker from '../workers/parser';
+import { createWebWorker } from '../utils';
 
 export default function useParser(handler) {
   const ParserWorker = useMemo(() => createWebWorker(parserWorker), []);

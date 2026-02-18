@@ -1,16 +1,17 @@
 import { useCallback } from 'react';
 import { Form, Table } from 'react-bootstrap';
 
-import { Calculator } from 'components/Calculator';
-import useCalculatorForm from 'hooks/useCalculatorForm';
-import { leadscrewPitches, stepAngles } from 'utils';
+import { Calculator } from '../components/Calculator';
+import useCalculatorForm from '../hooks/useCalculatorForm';
+import { ZAxisCalibrationForm } from '../types';
+import { leadscrewPitches, stepAngles } from '../utils';
 
 export default function ZAxisCalibration() {
   const {
     formik: { values, handleChange },
     errors,
     results
-  } = useCalculatorForm({
+  } = useCalculatorForm<ZAxisCalibrationForm>({
     initialValues: {
       layerHeight: 0.2,
       stepAngle: 1.8,
@@ -20,7 +21,7 @@ export default function ZAxisCalibration() {
       printHeight: 100
     },
     shouldShow: useCallback(() => true, []),
-    validate: useCallback((vals) => {
+    validate: useCallback((vals: ZAxisCalibrationForm) => {
       const result = [];
 
       if (vals.stepAngle <= 0) {
@@ -140,10 +141,10 @@ export default function ZAxisCalibration() {
                 {stepAngle}
               </option>
             ))}
-            <option value="custom">Custom</option>
+            <option value="-1">Custom</option>
           </Form.Select>
         </Form.Group>
-        {values.stepAngle === 'custom' && (
+        {values.stepAngle - 1 && (
           <Form.Group>
             <Form.Label>Custom Step Angle (&deg;)</Form.Label>
             <Form.Control
@@ -166,10 +167,10 @@ export default function ZAxisCalibration() {
                 {leadscrewPitch}
               </option>
             ))}
-            <option value="custom">Custom</option>
+            <option value="-1">Custom</option>
           </Form.Select>
         </Form.Group>
-        {values.leadscrewPitch === 'custom' && (
+        {values.leadscrewPitch === -1 && (
           <Form.Group>
             <Form.Label>Leadscrew Pitch (mm/rev)</Form.Label>
             <Form.Control

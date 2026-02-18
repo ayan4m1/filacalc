@@ -8,11 +8,12 @@ import {
   ProgressBar
 } from 'react-bootstrap';
 
-import { Calculator } from 'components/Calculator';
-import useCalculatorForm from 'hooks/useCalculatorForm';
-import { useSettingsContext } from 'hooks/useSettingsContext';
-import useParser from 'hooks/useParser';
-import { materials, getMaterial } from 'utils';
+import { Calculator } from '../components/Calculator';
+import useCalculatorForm from '../hooks/useCalculatorForm';
+import { useSettingsContext } from '../hooks/useSettingsContext';
+import useParser from '../hooks/useParser';
+import { FilamentUsageForm } from '../types';
+import { materials, getMaterial } from '../utils';
 
 export default function FilamentUsage() {
   const { filamentDiameter } = useSettingsContext();
@@ -20,7 +21,7 @@ export default function FilamentUsage() {
     formik: { setFieldValue, handleBlur, handleChange, values },
     errors,
     results
-  } = useCalculatorForm({
+  } = useCalculatorForm<FilamentUsageForm>({
     initialValues: {
       material: '',
       diameter: filamentDiameter,

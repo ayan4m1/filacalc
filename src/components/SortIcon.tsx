@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useCallback, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -6,7 +5,12 @@ import {
   faSortAlphaUp
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function SortIcon({ column, onToggle }) {
+interface IProps {
+  column: string;
+  onToggle: (column: string, direction: boolean) => void;
+}
+
+export default function SortIcon({ column, onToggle }: IProps) {
   const [direction, setDirection] = useState(false);
   const handleToggle = useCallback(() => {
     setDirection((dir) => {
@@ -28,8 +32,3 @@ export default function SortIcon({ column, onToggle }) {
     />
   );
 }
-
-SortIcon.propTypes = {
-  column: PropTypes.string.isRequired,
-  onToggle: PropTypes.func.isRequired
-};

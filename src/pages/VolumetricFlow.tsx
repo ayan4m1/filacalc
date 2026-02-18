@@ -2,27 +2,26 @@ import { useFormik } from 'formik';
 import { Fragment, useCallback } from 'react';
 import { Button, Form, Dropdown } from 'react-bootstrap';
 
-import { useSettingsContext } from 'hooks/useSettingsContext';
-import { getHotend, getNozzle, hotends, nozzles } from 'utils';
+import { useSettingsContext } from '../hooks/useSettingsContext';
+import { getHotend, getNozzle, hotends, nozzles } from '../utils';
 
 export default function VolumetricFlow() {
   const { filamentDiameter } = useSettingsContext();
-  const initialValues = {
-    nozzle: null,
-    hotend: null,
-    nozzleDiameter: 0.4,
-    filamentDiameter,
-    customNozzleDiameter: 0,
-    customNozzleLength: 0,
-    customMeltZoneDiameter: 0,
-    customMeltZoneLength: 0,
-    layerHeight: 0.2,
-    extrusionWidth: 0.3,
-    printSpeed: 50
-  };
 
   const { values, handleChange, handleSubmit, setFieldValue } = useFormik({
-    initialValues,
+    initialValues: {
+      nozzle: null,
+      hotend: null,
+      nozzleDiameter: 0.4,
+      filamentDiameter,
+      customNozzleDiameter: 0,
+      customNozzleLength: 0,
+      customMeltZoneDiameter: 0,
+      customMeltZoneLength: 0,
+      layerHeight: 0.2,
+      extrusionWidth: 0.3,
+      printSpeed: 50
+    },
     onSubmit: useCallback((vals) => {
       const nozzle =
         vals.nozzle !== 'custom'
@@ -101,9 +100,7 @@ export default function VolumetricFlow() {
                   {hotend.name}
                 </Dropdown.Item>
               ))}
-              <Dropdown.Item eventKey="custom" value="custom">
-                Custom
-              </Dropdown.Item>
+              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>
@@ -140,9 +137,7 @@ export default function VolumetricFlow() {
                   {nozzle.name}
                 </Dropdown.Item>
               ))}
-              <Dropdown.Item eventKey="custom" value="custom">
-                Custom
-              </Dropdown.Item>
+              <Dropdown.Item eventKey="custom">Custom</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>

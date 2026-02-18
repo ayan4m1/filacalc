@@ -1,14 +1,43 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import PropTypes from 'prop-types';
-import { Fragment } from 'react';
+import { Fragment, ReactNode } from 'react';
 import { Card, Alert, Row, Col } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
-export const Calculator = ({ children }) => <Fragment>{children}</Fragment>;
+interface CalculatorProps {
+  children: ReactNode;
+}
 
-const Description = ({ children }) =>
+interface CalcDescriptionProps {
+  children: ReactNode;
+}
+
+interface CalcHeadingProps {
+  title: string;
+  icon?: IconProp;
+  children?: ReactNode;
+}
+
+interface CalcErrorsProps {
+  errors: string[];
+}
+
+interface CalcResultsProps {
+  title?: string;
+  results?: {
+    label: string;
+    content: string;
+  }[];
+  children?: ReactNode;
+}
+
+export const Calculator = ({ children }: CalculatorProps) => (
+  <Fragment>{children}</Fragment>
+);
+
+const Description = ({ children }: CalcDescriptionProps) =>
   Boolean(children) && <div className="my-4">{children}</div>;
 
-const Heading = ({ title, icon, children }) => (
+const Heading = ({ title, icon, children }: CalcHeadingProps) => (
   <Fragment>
     {Boolean(title) && <title>{`Filacalc - ${title}`}</title>}
     <h1>
@@ -19,7 +48,7 @@ const Heading = ({ title, icon, children }) => (
   </Fragment>
 );
 
-const Errors = ({ errors }) => {
+const Errors = ({ errors }: CalcErrorsProps) => {
   if (!errors?.length) {
     return null;
   }
@@ -35,7 +64,11 @@ const Errors = ({ errors }) => {
   );
 };
 
-const Results = ({ title = 'Results', results, children }) => {
+const Results = ({
+  title = 'Results',
+  results,
+  children
+}: CalcResultsProps) => {
   if (!children && !results?.length) {
     return null;
   }
@@ -62,33 +95,6 @@ const Results = ({ title = 'Results', results, children }) => {
       {children}
     </Card>
   );
-};
-
-Calculator.propTypes = {
-  children: PropTypes.node.isRequired
-};
-
-Description.propTypes = {
-  children: PropTypes.node
-};
-
-Heading.propTypes = {
-  children: PropTypes.node,
-  icon: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  title: PropTypes.string
-};
-
-Errors.propTypes = {
-  errors: PropTypes.arrayOf(PropTypes.string.isRequired)
-};
-
-Results.propTypes = {
-  title: PropTypes.string,
-  results: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.object.isRequired),
-    PropTypes.object.isRequired
-  ]),
-  children: PropTypes.node
 };
 
 Calculator.Errors = Errors;

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getAsciiBytes, getAsciiString, supportsWebSerial } from 'utils';
+
+import { getAsciiBytes, getAsciiString, supportsWebSerial } from '../utils';
 
 const readUntil = async (reader, isEnd) => {
   let result = '';

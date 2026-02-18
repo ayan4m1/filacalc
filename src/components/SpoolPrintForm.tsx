@@ -1,5 +1,4 @@
 import { useFormik } from 'formik';
-import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 import {
   Button,
@@ -14,8 +13,9 @@ import {
 } from 'react-bootstrap';
 import * as Yup from 'yup';
 
-import useParser from 'hooks/useParser';
-import { getMaterial, getRemainingFilament } from 'utils';
+import useParser from '../hooks/useParser';
+import { getMaterial, getRemainingFilament } from '../utils';
+import { Spool, SpoolPrintForm } from '../types';
 
 const FormSchema = Yup.object({
   filamentLength: Yup.number().moreThan(
@@ -25,14 +25,19 @@ const FormSchema = Yup.object({
   copies: Yup.number().moreThan(0, 'Copies must be greater than zero.')
 });
 
-export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
-  const initialValues = {
-    filamentLength: 0,
-    copies: 1
-  };
+interface IProps {
+  spool: Spool;
+  onHide: () => void;
+  onSubmit: CallableFunction;
+}
+
+export default function SpoolPrintForm({ spool, onHide, onSubmit }: IProps) {
   const { errors, values, handleChange, handleSubmit, setFieldValue } =
-    useFormik({
-      initialValues,
+    useFormik<SpoolPrintForm>({
+      initialValues: {
+        filamentLength: 0,
+        copies: 1
+      },
       validationSchema: FormSchema,
       onSubmit: useCallback(
         (vals) => {
@@ -194,7 +199,7 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
           </Button>
           <Button
             disabled={remainingFilamentLength <= 0}
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             variant="primary"
           >
             Print
@@ -204,9 +209,3 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }) {
     </Modal>
   );
 }
-
-SpoolPrintForm.propTypes = {
-  onHide: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  spool: PropTypes.object.isRequired
-};

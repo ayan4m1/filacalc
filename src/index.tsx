@@ -1,26 +1,35 @@
 import { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createHashRouter, RouterProvider } from 'react-router-dom';
+import {
+  createHashRouter,
+  IndexRouteObject,
+  RouteObject,
+  RouterProvider
+} from 'react-router-dom';
 
 import './index.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import Layout from 'components/Layout';
-import SettingsProvider from 'components/SettingsProvider';
-import SuspenseFallback from 'components/SuspenseFallback';
-import ErrorBoundary from 'components/ErrorBoundary';
+import Layout from './components/Layout';
+import SettingsProvider from './components/SettingsProvider';
+import SuspenseFallback from './components/SuspenseFallback';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const createRouteForPage = (pathOrIndex, pageName) => {
-  const result = {};
+  let result: RouteObject | IndexRouteObject;
 
   if (typeof pathOrIndex === 'boolean') {
-    result.index = pathOrIndex;
+    result = {
+      index: pathOrIndex
+    };
   } else if (typeof pathOrIndex === 'string') {
-    result.path = pathOrIndex;
+    result = {
+      path: pathOrIndex
+    };
   }
 
   result.lazy = async () => ({
-    Component: (await import(`components/${pageName}`)).default
+    Component: (await import(`./pages/${pageName}.tsx`)).default
   });
 
   return result;

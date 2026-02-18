@@ -1,6 +1,8 @@
-import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 import autoprefixer from 'autoprefixer';
 import HtmlPlugin from 'html-webpack-plugin';
+import { Configuration, WebpackPluginInstance } from 'webpack';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import CnameWebpackPlugin from 'cname-webpack-plugin';
@@ -11,10 +13,12 @@ import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
+import 'webpack-dev-server';
+
 const dev = process.env.NODE_ENV === 'development';
 const analyzeBundle = process.env.BUNDLE_ANALYZE === 'true';
 
-const plugins = [
+const plugins: WebpackPluginInstance[] = [
   new CleanPlugin(),
   new HtmlPlugin({
     template: './src/index.html'
@@ -42,10 +46,10 @@ if (analyzeBundle) {
   plugins.push(new BundleAnalyzerPlugin());
 }
 
-export default {
+const config: Configuration = {
   mode: dev ? 'development' : 'production',
   devtool: dev ? 'eval-cheap-module-source-map' : false,
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   devServer: {
     compress: dev,
     open: true,
@@ -58,6 +62,11 @@ export default {
         test: /\.js$/,
         exclude: /node_modules/,
         use: ['babel-loader']
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: ['ts-loader']
       },
       {
         test: /\.(sa|sc|c)ss$/,
@@ -100,18 +109,14 @@ export default {
     ]
   },
   output: {
-    path: resolve(__dirname, 'dist'),
+    path: resolve(dirname(fileURLToPath(import.meta.url)), 'dist'),
     filename: '[name].js',
     chunkFilename: '[name].js'
   },
   plugins,
   resolve: {
-    extensions: ['.js', '.json'],
-    modules: ['node_modules', 'src'],
-    alias: {
-      components: resolve(__dirname, 'src/components'),
-      utils: resolve(__dirname, 'src/utils')
-    }
+    extensions: ['.js', '.ts', '.tsx', '.json'],
+    modules: ['node_modules', 'src']
   },
   optimization: {
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
@@ -132,3 +137,5 @@ export default {
   },
   ignoreWarnings: [/@import rules/]
 };
+
+export default config;

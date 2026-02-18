@@ -1,8 +1,14 @@
-import PropTypes from 'prop-types';
-import { DatePicker } from 'react-datepicker';
 import { SketchPicker } from 'react-color';
+import { DatePicker } from 'react-datepicker';
 import { parseISO, formatISO } from 'date-fns';
-import { Fragment, useCallback, useState } from 'react';
+import { FormikErrors, FormikValues } from 'formik';
+import {
+  ChangeEventHandler,
+  Fragment,
+  SyntheticEvent,
+  useCallback,
+  useState
+} from 'react';
 import {
   faDownload,
   faInfoCircle,
@@ -22,7 +28,24 @@ import {
   Tooltip
 } from 'react-bootstrap';
 
-import { materials, supportsWebSerial } from 'utils';
+import { materials, supportsWebSerial } from '../utils';
+import { Spool } from '../types';
+
+interface IProps {
+  isSpoolSelected: boolean;
+  form: {
+    errors: FormikErrors<Spool>;
+    values: FormikValues;
+    setFieldValue: CallableFunction;
+    handleChange: ChangeEventHandler;
+    handleSubmit: (event: SyntheticEvent<HTMLFormElement>) => void;
+  };
+  onHide: () => void;
+  serialPort: SerialPort;
+  readData: CallableFunction;
+  close: () => void;
+  waiting: boolean;
+}
 
 export default function SpoolEditForm({
   isSpoolSelected,
@@ -32,7 +55,7 @@ export default function SpoolEditForm({
   readData,
   close,
   waiting
-}) {
+}: IProps) {
   const [connected, setConnected] = useState(false);
   const handleDateChange = useCallback(
     (date) => setFieldValue('purchaseDate', formatISO(date)),
@@ -311,7 +334,7 @@ export default function SpoolEditForm({
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={onHide} variant="secondary">
+          <Button onClick={() => onHide()} variant="secondary">
             Cancel
           </Button>
           <Button type="submit" variant="primary">
@@ -322,19 +345,3 @@ export default function SpoolEditForm({
     </Modal>
   );
 }
-
-SpoolEditForm.propTypes = {
-  isSpoolSelected: PropTypes.bool.isRequired,
-  form: PropTypes.shape({
-    errors: PropTypes.object.isRequired,
-    values: PropTypes.object.isRequired,
-    setFieldValue: PropTypes.func.isRequired,
-    handleChange: PropTypes.func.isRequired,
-    handleSubmit: PropTypes.func.isRequired
-  }).isRequired,
-  onHide: PropTypes.func.isRequired,
-  serialPort: PropTypes.object,
-  readData: PropTypes.func.isRequired,
-  close: PropTypes.func.isRequired,
-  waiting: PropTypes.bool.isRequired
-};

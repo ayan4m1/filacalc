@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { Card, Container } from 'react-bootstrap';
 import { isRouteErrorResponse, useRouteError } from 'react-router';
 
@@ -40,7 +39,3 @@ export default function ErrorBoundary() {
     );
   }
 }
-
-ErrorBoundary.propTypes = {
-  error: PropTypes.object
-};

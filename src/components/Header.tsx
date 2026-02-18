@@ -19,7 +19,7 @@ import {
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-import spoolLogo from 'images/filament-spool.svg';
+import spoolLogo from '../images/filament-spool.svg';
 
 export default function Header() {
   return (

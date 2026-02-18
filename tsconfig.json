@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "outDir": "./dist",
+    "target": "es6",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "baseUrl": "."
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "index.d.ts"]
+}

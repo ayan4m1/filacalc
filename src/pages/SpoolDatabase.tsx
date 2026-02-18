@@ -14,7 +14,14 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import fileDownload from 'js-file-download';
-import { Fragment, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  Fragment,
+  useCallback,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { getContrastingColor } from 'react-color/lib/helpers/color';
 import {
   Badge,
@@ -30,12 +37,12 @@ import {
 import { v4 } from 'uuid';
 import * as Yup from 'yup';
 
-import SortIcon from 'components/SortIcon';
-import useTd1Serial from 'hooks/useTd1Serial';
-import { useSettingsContext } from 'hooks/useSettingsContext';
-import { getRemainingFilament, supportsWebSerial } from 'utils';
-import SpoolEditForm from 'components/SpoolDatabase/SpoolEditForm';
-import SpoolPrintForm from 'components/SpoolDatabase/SpoolPrintForm';
+import SortIcon from '../components/SortIcon';
+import useTd1Serial from '../hooks/useTd1Serial';
+import { useSettingsContext } from '../hooks/useSettingsContext';
+import { getRemainingFilament, supportsWebSerial } from '../utils';
+import SpoolEditForm from '../components/SpoolEditForm';
+import SpoolPrintForm from '../components/SpoolPrintForm';
 
 const SpoolSchema = Yup.object({
   vendor: Yup.string().required('Vendor must be provided.'),
@@ -81,7 +88,7 @@ export default function SpoolDatabase() {
     purchaseCost: 0
   };
   const { serialPort, connect, readData, close, waiting } = useTd1Serial();
-  const restoreRef = useRef();
+  const restoreRef = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showPrintForm, setShowPrintForm] = useState(false);
@@ -142,7 +149,7 @@ export default function SpoolDatabase() {
   const { handleReset, setFieldValue } = form;
 
   const handleAdd = useCallback(() => {
-    handleReset();
+    handleReset(null);
     setShowEditForm(true);
     setSelectedId(null);
   }, [handleReset]);
@@ -204,7 +211,7 @@ export default function SpoolDatabase() {
     }
   }, [restoreRef]);
   const handleImportSubmit = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       const {
         target: {
           files: [file]
@@ -216,7 +223,7 @@ export default function SpoolDatabase() {
         const {
           target: { result }
         } = loaded;
-        const parsed = JSON.parse(result);
+        const parsed = JSON.parse(result.valueOf() as string);
 
         if (
           parsed &&
