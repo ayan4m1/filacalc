@@ -83,7 +83,7 @@ export default () => {
       percentComplete = 0;
 
     reader.addEventListener('load', (e) => {
-      const code = e.target.result;
+      const code = e.target.result as string;
       const lines = code.split(/[\n]/g);
       const movementCommands = lines.filter((line) => /^G[1-3]/.test(line));
 

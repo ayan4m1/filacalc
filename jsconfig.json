@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "module": "commonjs",
-    "jsx": "react",
-    "baseUrl": "./src"
-  },
-  "include": ["src/", "index.d.ts"]
-}
