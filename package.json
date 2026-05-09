@@ -22,7 +22,7 @@
     "date-fns": "^4.1.0",
     "formik": "^2.4.9",
     "js-file-download": "^0.4.12",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.10",
     "react": "^19.2.4",
     "react-bootstrap": "^2.10.10",
     "react-color": "^2.19.3",
