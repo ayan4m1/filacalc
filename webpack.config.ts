@@ -2,21 +2,19 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import autoprefixer from 'autoprefixer';
 import HtmlPlugin from 'html-webpack-plugin';
-import { Configuration, WebpackPluginInstance } from 'webpack';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
+import type { Configuration, WebpackPluginInstance } from 'webpack';
 import CnameWebpackPlugin from 'cname-webpack-plugin';
 import StylelintPlugin from 'stylelint-webpack-plugin';
 import postcssFlexbugsFixes from 'postcss-flexbugs-fixes';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 import 'webpack-dev-server';
 
 const dev = process.env.NODE_ENV === 'development';
-const analyzeBundle = process.env.BUNDLE_ANALYZE === 'true';
 
 const plugins: WebpackPluginInstance[] = [
   new CleanPlugin(),
@@ -40,10 +38,6 @@ if (dev) {
       configType: 'flat'
     })
   );
-}
-
-if (analyzeBundle) {
-  plugins.push(new BundleAnalyzerPlugin());
 }
 
 const config: Configuration = {
