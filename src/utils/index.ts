@@ -104,3 +104,5 @@ export const getAsciiString = (bytes: Uint8Array) =>
   String.fromCharCode.apply(null, Array.from(bytes));
 
 export const supportsWebSerial = 'serial' in navigator;
+
+export const supportsWebMidi = 'requestMIDIAccess' in navigator;

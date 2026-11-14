@@ -38,9 +38,9 @@ import { v4 } from 'uuid';
 import * as Yup from 'yup';
 
 import SortIcon from '../components/SortIcon';
-import useTd1Serial from '../hooks/useTd1Serial';
+import useTd1Midi from '../hooks/useTd1Midi';
 import { useSettingsContext } from '../hooks/useSettingsContext';
-import { getRemainingFilament, supportsWebSerial } from '../utils';
+import { getRemainingFilament, supportsWebMidi } from '../utils';
 import SpoolEditForm from '../components/SpoolEditForm';
 import SpoolPrintForm from '../components/SpoolPrintForm';
 
@@ -87,7 +87,13 @@ export default function SpoolDatabase() {
     purchaseDate: formatISO(new Date()),
     purchaseCost: 0
   };
-  const { serialPort, connect, readData, close, waiting } = useTd1Serial();
+  const { connect } = useTd1Midi(
+    (input: MIDIInput, message: MIDIMessageEvent) => {
+      console.dir(input);
+      console.dir(message.data);
+    }
+  );
+  // const { serialPort, connect, readData, close, waiting } = useTd1Serial();
   const restoreRef = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -267,13 +273,13 @@ export default function SpoolDatabase() {
       <title>{`Filacalc - Spool Database`}</title>
       {showEditForm && (
         <SpoolEditForm
-          close={close}
+          // close={close}
           form={form}
           isSpoolSelected={Boolean(selectedId)}
           onHide={hideForm}
-          readData={readData}
-          serialPort={serialPort}
-          waiting={waiting}
+          // readData={readData}
+          // serialPort={serialPort}
+          // waiting={waiting}
         />
       )}
       {selectedId && showPrintForm && (
@@ -313,7 +319,12 @@ export default function SpoolDatabase() {
             <Button onClick={handleBackup}>
               <FontAwesomeIcon icon={faDownload} /> Backup
             </Button>
-            {!serialPort && supportsWebSerial && (
+            {/* {!serialPort && supportsWebSerial && (
+              <Button onClick={connect}>
+                <FontAwesomeIcon icon={faLightbulb} /> Add TD-1
+              </Button>
+            )} */}
+            {supportsWebMidi && (
               <Button onClick={connect}>
                 <FontAwesomeIcon icon={faLightbulb} /> Add TD-1
               </Button>
