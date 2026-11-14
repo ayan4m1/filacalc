@@ -24,11 +24,11 @@ export default function ZAxisCalibration() {
     validate: useCallback((vals: ZAxisCalibrationForm) => {
       const result = [];
 
-      if (vals.stepAngle <= 0) {
+      if (vals.stepAngle !== 'custom' && vals.stepAngle <= 0) {
         result.push('Step angle must be greater than zero.');
       }
 
-      if (vals.leadscrewPitch <= 0) {
+      if (vals.leadscrewPitch !== 'custom' && vals.leadscrewPitch <= 0) {
         result.push('Leadscrew pitch must be greater than zero.');
       }
 
@@ -41,14 +41,12 @@ export default function ZAxisCalibration() {
     calculate: useCallback((vals) => {
       const layerHeights = [];
 
-      const stepAngle = parseFloat(
-        vals.stepAngle === 'custom' ? vals.customStepAngle : vals.stepAngle
-      );
-      const leadscrewPitch = parseFloat(
+      const stepAngle =
+        vals.stepAngle === 'custom' ? vals.customStepAngle : vals.stepAngle;
+      const leadscrewPitch =
         vals.leadscrewPitch === 'custom'
           ? vals.customLeadscrewPitch
-          : vals.leadscrewPitch
-      );
+          : vals.leadscrewPitch;
 
       const stepHeight = leadscrewPitch / (360 / stepAngle);
 
@@ -59,7 +57,7 @@ export default function ZAxisCalibration() {
         layerHeights.push({
           height: Math.floor(heightMultiple) * stepHeight,
           steps: Math.floor(heightMultiple),
-          error: 0
+          error: '0'
         });
         let error =
           heightMultiple / stepHeight - Math.floor(heightMultiple / stepHeight);
@@ -81,7 +79,7 @@ export default function ZAxisCalibration() {
         layerHeights.push({
           height: Math.ceil(heightMultiple) * stepHeight,
           steps: Math.ceil(heightMultiple),
-          error: 0
+          error: '0'
         });
       }
 
@@ -144,7 +142,7 @@ export default function ZAxisCalibration() {
             <option value="-1">Custom</option>
           </Form.Select>
         </Form.Group>
-        {values.stepAngle - 1 && (
+        {values.stepAngle === 'custom' && (
           <Form.Group>
             <Form.Label>Custom Step Angle (&deg;)</Form.Label>
             <Form.Control
@@ -170,7 +168,7 @@ export default function ZAxisCalibration() {
             <option value="-1">Custom</option>
           </Form.Select>
         </Form.Group>
-        {values.leadscrewPitch === -1 && (
+        {values.leadscrewPitch === 'custom' && (
           <Form.Group>
             <Form.Label>Leadscrew Pitch (mm/rev)</Form.Label>
             <Form.Control
@@ -206,18 +204,18 @@ export default function ZAxisCalibration() {
       </Form>
       <Calculator.Errors errors={errors} />
       {Boolean(results) && (
-        <Calculator.Results results={results.results}>
-          {!results.evenlyDivisible && (
+        <Calculator.Results results={results?.results}>
+          {!results?.evenlyDivisible && (
             <Table>
               <thead>
                 <tr>
                   <th>Layer Height</th>
                   <th>Number of Steps</th>
-                  <th>Error over {results.printHeight / 10}cm</th>
+                  <th>Error over {(results?.printHeight ?? 0) / 10}cm</th>
                 </tr>
               </thead>
               <tbody>
-                {results.layerHeights.map((layerHeight) => (
+                {results?.layerHeights.map((layerHeight) => (
                   <tr key={layerHeight.height}>
                     <td
                       className={

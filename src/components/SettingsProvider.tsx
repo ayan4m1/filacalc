@@ -20,35 +20,39 @@ export default function SettingsProvider({ children }: IProps) {
   });
 
   const findSpool = useCallback(
-    (id) => spools.find((spool) => spool.id === id),
+    (id: string) => spools.find((spool) => spool.id === id),
     [spools]
   );
   const addSpool = useCallback(
-    (spool) => setSpools((spoolz) => [...spoolz, spool]),
+    (spool: Spool) => setSpools((spools) => [...spools, spool]),
     [setSpools]
   );
   const updateSpool = useCallback(
-    (spool) =>
-      setSpools((spoolz) => {
-        spoolz.splice(
-          spoolz.findIndex((innerSpool) => innerSpool.id === spool.id),
+    (spool: Spool) =>
+      setSpools((spools) => {
+        const newSpools = [...spools];
+
+        newSpools.splice(
+          spools.findIndex((innerSpool) => innerSpool.id === spool.id),
           1,
           spool
         );
 
-        return spoolz;
+        return newSpools;
       }),
     [setSpools]
   );
   const removeSpool = useCallback(
-    (spool) =>
-      setSpools((spoolz) => {
-        spoolz.splice(
-          spoolz.findIndex((innerSpool) => innerSpool.id === spool.id),
+    (spool: Spool) =>
+      setSpools((spools) => {
+        const newSpools = [...spools];
+
+        newSpools.splice(
+          spools.findIndex((innerSpool) => innerSpool.id === spool.id),
           1
         );
 
-        return spoolz;
+        return newSpools;
       }),
     [setSpools]
   );

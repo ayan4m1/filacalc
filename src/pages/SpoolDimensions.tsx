@@ -24,11 +24,12 @@ export default function SpoolDimensions() {
     },
     shouldShow: useCallback(
       (vals, touched) =>
-        touched.material ||
-        vals.material ||
-        touched.outerDiameter ||
-        touched.spoolDiameter ||
-        touched.spoolWidth,
+        (touched.material ||
+          Boolean(vals.material) ||
+          touched.outerDiameter ||
+          touched.spoolDiameter ||
+          touched.spoolWidth) ??
+        false,
       []
     ),
     validate: useCallback((vals) => {
@@ -61,8 +62,8 @@ export default function SpoolDimensions() {
     calculate: useCallback((vals) => {
       const materialDensity =
         vals.material !== 'custom'
-          ? getMaterial(vals.material).density
-          : parseFloat(vals.customMaterialDensity);
+          ? getMaterial(vals.material)?.density
+          : vals.customMaterialDensity;
       const remainingLength =
         ((Math.pow(vals.outerDiameter, 2) - Math.pow(vals.spoolDiameter, 2)) *
           Math.PI *
@@ -73,7 +74,7 @@ export default function SpoolDimensions() {
         1e3;
       const remainingVolume =
         Math.PI * Math.pow(vals.filamentDiameter / 2, 2) * remainingLength;
-      const remainingMass = materialDensity * remainingVolume;
+      const remainingMass = (materialDensity ?? 1) * remainingVolume;
 
       return [
         {

@@ -49,7 +49,7 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }: IProps) {
 
           if (spool.material !== 'custom') {
             consumedWeight =
-              consumedVolume * getMaterial(spool.material).density;
+              consumedVolume * (getMaterial(spool.material)?.density ?? 1);
           } else {
             consumedWeight = consumedVolume * spool.materialDensity;
           }
@@ -93,7 +93,7 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }: IProps) {
   const materialDensity =
     spool.material === 'custom'
       ? spool.materialDensity
-      : getMaterial(spool.material).density;
+      : (getMaterial(spool.material)?.density ?? 1);
   const consumedFilamentVolume =
     Math.PI * Math.pow(spool.filamentDiameter / 2, 2) * consumedFilamentLength;
   const consumedFilamentMass = consumedFilamentVolume * materialDensity;
@@ -102,7 +102,7 @@ export default function SpoolPrintForm({ spool, onHide, onSubmit }: IProps) {
   const remainingFilamentPercent =
     (remainingFilamentLength / spoolFilamentLength) * 1e2;
   const filamentCost =
-    (consumedFilamentMass / spool.netWeight) * spool.purchaseCost;
+    (consumedFilamentMass / spool.netWeight) * (spool.purchaseCost ?? 0);
 
   return (
     <Modal onHide={onHide} show>

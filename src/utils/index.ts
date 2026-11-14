@@ -1,3 +1,5 @@
+import { Spool } from '../types';
+
 export const createWebWorker = (worker) => {
   if (typeof window !== 'object') {
     return;
@@ -28,7 +30,7 @@ export const spools = [
   { brand: 'ZYLtech', mass: 179 }
 ];
 
-export const getSpool = (brand) =>
+export const getSpool = (brand: string) =>
   spools.find((spool) => spool.brand === brand);
 
 export const materials = [
@@ -47,7 +49,7 @@ export const materials = [
   { name: 'PMMA', density: 1.18 }
 ];
 
-export const getMaterial = (name) =>
+export const getMaterial = (name: string) =>
   materials.find((material) => material.name === name);
 
 export const nozzles = [
@@ -57,7 +59,7 @@ export const nozzles = [
   { name: 'Volcano 3mm', diameter: 3.2, length: 21 }
 ];
 
-export const getNozzle = (name) =>
+export const getNozzle = (name: string) =>
   nozzles.find((nozzle) => nozzle.name === name);
 
 export const hotends = [
@@ -65,20 +67,20 @@ export const hotends = [
   { name: 'Volcano', meltZoneDiameter: 6, meltZoneLength: 19 }
 ];
 
-export const getHotend = (name) =>
+export const getHotend = (name: string) =>
   hotends.find((hotend) => hotend.name === name);
 
 export const stepAngles = [1.8, 0.9, 7.5];
 
 export const leadscrewPitches = [1.25, 1, 12, 16, 25, 1.41111, 1.27, 1.5875];
 
-export const getRemainingFilament = (spool) => {
+export const getRemainingFilament = (spool: Spool) => {
   let volume = 0;
 
   const mass = spool.currentWeight - spool.spoolWeight;
 
   if (spool.material !== 'custom') {
-    volume = mass / getMaterial(spool.material).density;
+    volume = mass / (getMaterial(spool.material)?.density ?? 1);
   } else {
     volume = mass / spool.materialDensity;
   }
@@ -94,10 +96,10 @@ export const getRemainingFilament = (spool) => {
   };
 };
 
-export const getAsciiBytes = (str) =>
+export const getAsciiBytes = (str: string) =>
   Uint8Array.from(str.split('').map((char) => char.charCodeAt(0)));
 
-export const getAsciiString = (bytes) =>
+export const getAsciiString = (bytes: Uint8Array) =>
   String.fromCharCode.apply(null, Array.from(bytes));
 
 export const supportsWebSerial = 'serial' in navigator;

@@ -14,9 +14,9 @@ export type SpoolPrintForm = {
 
 export type ZAxisCalibrationForm = {
   layerHeight: number;
-  stepAngle: number;
+  stepAngle: number | 'custom';
   customStepAngle: number;
-  leadscrewPitch: number;
+  leadscrewPitch: number | 'custom';
   customLeadscrewPitch: number;
   printHeight: number;
 };
@@ -71,7 +71,7 @@ export type SettingsContext = {
   setFilamentDiameter: Dispatch<SetStateAction<number>>;
   spools: Spool[];
   setSpools: Dispatch<SetStateAction<Spool[]>>;
-  findSpool: (id: string) => Spool | null;
+  findSpool: (id: string) => Spool | undefined;
   addSpool: (spool: Spool) => void;
   updateSpool: (spool: Spool) => void;
   removeSpool: (spool: Spool) => void;

@@ -22,7 +22,7 @@ export default function ExtruderCalibration() {
       (
         _: ExtruderCalibrationForm,
         touched: FormikTouched<ExtruderCalibrationForm>
-      ) => touched.extrusionLength || touched.measuredOffset,
+      ) => (touched.extrusionLength || touched.measuredOffset) ?? false,
       []
     ),
     validate: useCallback((vals: ExtruderCalibrationForm) => {
@@ -165,7 +165,7 @@ export default function ExtruderCalibration() {
         <Calculator.Results>
           <p>
             The corrected value is{' '}
-            <strong>{results.stepsPerMm.toFixed(2)} steps/mm.</strong>
+            <strong>{results?.stepsPerMm.toFixed(2)} steps/mm.</strong>
           </p>
         </Calculator.Results>
       )}

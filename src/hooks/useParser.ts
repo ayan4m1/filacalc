@@ -1,16 +1,33 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 import parserWorker from '../workers/parser';
 import { createWebWorker } from '../utils';
 
-export default function useParser(handler) {
+type ProgressEvent = {
+  type: 'progress';
+  progress: number;
+};
+
+type ResultEvent = {
+  type: 'result';
+  length: number;
+};
+
+type ErrorEvent = {
+  type: 'error';
+  error: object;
+};
+
+type ParserEvent = ProgressEvent | ResultEvent | ErrorEvent;
+
+export default function useParser(handler: (result: ResultEvent) => void) {
   const ParserWorker = useMemo(() => createWebWorker(parserWorker), []);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const parseHandler = useCallback(
-    ({ data }) => {
+    ({ data }: { data: ParserEvent }) => {
       switch (data.type) {
         case 'progress':
           setProgress(data.progress);
@@ -32,12 +49,8 @@ export default function useParser(handler) {
   );
 
   const handleChange = useCallback(
-    (event) => {
-      const {
-        target: {
-          files: [file]
-        }
-      } = event;
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
 
       if (!file || !file.name.endsWith('.gcode')) {
         setError(true);
@@ -49,15 +62,15 @@ export default function useParser(handler) {
       setLoading(true);
       setProgress(0);
 
-      ParserWorker.postMessage(file);
+      ParserWorker?.postMessage(file);
     },
     [ParserWorker]
   );
 
   useEffect(() => {
-    ParserWorker.addEventListener('message', parseHandler);
+    ParserWorker?.addEventListener('message', parseHandler);
 
-    return () => ParserWorker.removeEventListener('message', parseHandler);
+    return () => ParserWorker?.removeEventListener('message', parseHandler);
   });
 
   return {

@@ -31,7 +31,10 @@ export default function FilamentUsage() {
     },
     shouldShow: useCallback(
       (vals, touched) =>
-        touched.material || vals.material || touched.length || vals.length,
+        touched.material ||
+        Boolean(vals.material) ||
+        touched.length ||
+        Boolean(vals.length),
       []
     ),
     validate: useCallback((vals) => {
@@ -57,9 +60,9 @@ export default function FilamentUsage() {
         1e3;
       const density =
         vals.material !== 'custom'
-          ? getMaterial(vals.material).density
+          ? getMaterial(vals.material)?.density
           : vals.customMaterialDensity;
-      const mass = volume * density;
+      const mass = volume * (density ?? 1);
 
       let cost = 0;
 

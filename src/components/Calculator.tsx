@@ -66,7 +66,7 @@ const Errors = ({ errors }: CalcErrorsProps) => {
 
 const Results = ({
   title = 'Results',
-  results,
+  results = [],
   children
 }: CalcResultsProps) => {
   if (!children && !results?.length) {
@@ -80,7 +80,9 @@ const Results = ({
         results.map((result, index) => (
           <Row
             className={
-              Boolean(children) && index === results.length - 1 ? 'mb-4' : null
+              Boolean(children) && index === results.length - 1
+                ? 'mb-4'
+                : undefined
             }
             key={result.label}
           >

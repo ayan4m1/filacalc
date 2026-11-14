@@ -1,9 +1,9 @@
 export default () => {
-  const parseMove = (line) => [
+  const parseMove = (line: string) => [
     ...line.trim().matchAll(/(\s*(([XYZFEIJR])([0-9\-.]+))\s*)/g)
   ];
 
-  const getExtrusionLength = (command) => {
+  const getExtrusionLength = (command: string) => {
     for (const [, , , axis, position] of parseMove(command)) {
       if (axis === 'E') {
         return parseFloat(position);
@@ -83,7 +83,7 @@ export default () => {
       percentComplete = 0;
 
     reader.addEventListener('load', (e) => {
-      const code = e.target.result as string;
+      const code = e.target?.result as string;
       const lines = code.split(/[\n]/g);
       const movementCommands = lines.filter((line) => /^G[1-3]/.test(line));
 

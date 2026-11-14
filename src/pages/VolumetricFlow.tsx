@@ -22,7 +22,7 @@ export default function VolumetricFlow() {
       extrusionWidth: 0.3,
       printSpeed: 50
     },
-    onSubmit: useCallback((vals) => {
+    onSubmit: (vals) => {
       const nozzle =
         vals.nozzle !== 'custom'
           ? getNozzle(vals.nozzle)
@@ -37,6 +37,11 @@ export default function VolumetricFlow() {
               meltZoneDiameter: vals.customMeltZoneDiameter,
               meltZoneLength: vals.customMeltZoneLength
             };
+
+      if (!hotend || !nozzle) {
+        return;
+      }
+
       const newNozzleVolume =
         Math.PI * Math.pow(nozzle.diameter / 2.0, 2) * nozzle.length;
       const newMeltZoneVolume =
@@ -53,15 +58,19 @@ export default function VolumetricFlow() {
         )} mm^3 = ${totalMeltVolume.toFixed(2)} mm^3`
       );
       console.dir(`${desiredFlowRate} mm^3/s`);
-    }, [])
+    }
   });
 
   const changeNozzle = useCallback(
-    (name) => setFieldValue('nozzle', name),
+    (name: string | null) => {
+      setFieldValue('nozzle', name);
+    },
     [setFieldValue]
   );
   const changeHotend = useCallback(
-    (name) => setFieldValue('hotend', name),
+    (name: string | null) => {
+      setFieldValue('hotend', name);
+    },
     [setFieldValue]
   );
 

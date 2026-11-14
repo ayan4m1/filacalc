@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { getAsciiBytes, getAsciiString, supportsWebSerial } from '../utils';
 
-const readUntil = async (reader, isEnd) => {
+const readUntil = async (
+  reader: ReadableStreamDefaultReader,
+  isEnd: (val: string) => boolean
+) => {
   let result = '';
 
   while (true) {
@@ -35,11 +38,14 @@ const readUntil = async (reader, isEnd) => {
 };
 
 export default function useTd1Serial() {
-  const [serialPort, setSerialPort] = useState(null);
+  const [serialPort, setSerialPort] = useState<SerialPort>();
   const [portClosed, setPortClosed] = useState(false);
-  const [dataStreams, setDataStreams] = useState({
-    reader: null,
-    writer: null
+  const [dataStreams, setDataStreams] = useState<{
+    reader: ReadableStreamDefaultReader | undefined;
+    writer: WritableStreamDefaultWriter | undefined;
+  }>({
+    reader: undefined,
+    writer: undefined
   });
   const [waiting, setWaiting] = useState(false);
   const readData = useCallback(async () => {
@@ -47,14 +53,18 @@ export default function useTd1Serial() {
       return {};
     }
 
-    let reader = null,
-      writer = null;
+    let reader: ReadableStreamDefaultReader | undefined,
+      writer: WritableStreamDefaultWriter | undefined;
 
     try {
       await serialPort.open({ baudRate: 115200 });
 
-      reader = serialPort.readable.getReader();
-      writer = serialPort.writable.getWriter();
+      reader = serialPort.readable?.getReader();
+      writer = serialPort.writable?.getWriter();
+
+      if (!reader || !writer) {
+        return {};
+      }
 
       setDataStreams({
         reader,
@@ -122,8 +132,12 @@ export default function useTd1Serial() {
         setSerialPort(grantedPort);
       }
     } catch (error) {
-      if (!error.message.includes('No port selected')) {
-        alert(error.message);
+      if (error instanceof Error) {
+        if (!error.message.includes('No port selected')) {
+          alert(error.message);
+        }
+      } else {
+        console.error('Unknown serial error occurred!');
       }
     }
   }, []);

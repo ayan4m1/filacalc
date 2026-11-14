@@ -7,7 +7,7 @@ export const SettingsContext = createContext<SettingsContextType>({
   filamentDiameter: 1.75,
   setFilamentDiameter: () => {},
   findSpool: () => {
-    return null;
+    return undefined;
   },
   addSpool: () => {},
   updateSpool: () => {},

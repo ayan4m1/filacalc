@@ -7,8 +7,9 @@
     "jsx": "react-jsx",
     "outDir": "./dist",
     "target": "es6",
+    "rootDir": ".",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "rootDir": "."
+    "types": ["w3c-web-serial"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "index.d.ts"]
 }

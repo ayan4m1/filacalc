@@ -58,11 +58,11 @@ export default function SpoolEditForm({
 }: IProps) {
   const [connected, setConnected] = useState(false);
   const handleDateChange = useCallback(
-    (date) => setFieldValue('purchaseDate', formatISO(date)),
+    (date: string) => setFieldValue('purchaseDate', formatISO(date)),
     [setFieldValue]
   );
   const handleColorChange = useCallback(
-    (color) => setFieldValue('color', color.hex),
+    (color: { hex: string }) => setFieldValue('color', color.hex),
     [setFieldValue]
   );
   const handleFetchClick = useCallback(async () => {

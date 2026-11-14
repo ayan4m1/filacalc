@@ -25,7 +25,10 @@ export default function SpoolWeight() {
     },
     shouldShow: useCallback(
       (vals, touched) =>
-        touched.brand || vals.brand || touched.material || vals.material,
+        touched.brand ||
+        Boolean(vals.brand) ||
+        touched.material ||
+        Boolean(vals.material),
       []
     ),
     validate: useCallback((vals) => {
@@ -43,9 +46,9 @@ export default function SpoolWeight() {
         result.push('Select a brand.');
       } else {
         const spoolMass =
-          vals.brand !== 'custom'
-            ? getSpool(vals.brand).mass
-            : parseFloat(vals.customSpoolMass);
+          (vals.brand !== 'custom'
+            ? getSpool(vals.brand)?.mass
+            : vals.customSpoolMass) ?? 0;
         const remainingMass = Math.max(0, vals.currentWeight - spoolMass);
 
         if (remainingMass === 0) {
@@ -61,7 +64,7 @@ export default function SpoolWeight() {
     }, []),
     calculate: useCallback((vals) => {
       if (vals.brand !== 'custom') {
-        vals.spoolWeight = getSpool(vals.brand).mass;
+        vals.spoolWeight = getSpool(vals.brand)?.mass ?? 0;
       }
 
       const {
