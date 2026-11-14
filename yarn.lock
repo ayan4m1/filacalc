@@ -1880,6 +1880,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-color@npm:^3.0.13":
+  version: 3.0.13
+  resolution: "@types/react-color@npm:3.0.13"
+  dependencies:
+    "@types/reactcss": "npm:*"
+  peerDependencies:
+    "@types/react": "*"
+  checksum: 10c0/a26a2a628dc98d2186743a52e18fc1a4622ba9ec69989be1e51614084fd90a52c139ea6689aa9706fcea94356d277c87d69f11a5c1f66c19b45e6b0132db40bb
+  languageName: node
+  linkType: hard
+
 "@types/react-transition-group@npm:^4.4.6":
   version: 4.4.12
   resolution: "@types/react-transition-group@npm:4.4.12"
@@ -1904,6 +1915,15 @@ __metadata:
   dependencies:
     csstype: "npm:^3.2.2"
   checksum: 10c0/bc2c4af96b3e480604424de70d5ebda90c5f4b485df471858c0bc2d7d70364b606ec3c4d8579f94f01aa0c6c0591f56bcf14cba5689f5eea4b74250ccdc3a232
+  languageName: node
+  linkType: hard
+
+"@types/reactcss@npm:*":
+  version: 1.2.13
+  resolution: "@types/reactcss@npm:1.2.13"
+  peerDependencies:
+    "@types/react": "*"
+  checksum: 10c0/f1b1e257dd7f02e1b50b2622c05a3fdcdb67045fdbbeab1f6ed7ef91e06f19d8899a3d7bd828c34bd2b243b7b7dd4c35376b947a683f5c0d56ea8a16b482f73d
   languageName: node
   linkType: hard
 
@@ -1947,10 +1967,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/w3c-web-serial@npm:^1.0.8":
-  version: 1.0.8
-  resolution: "@types/w3c-web-serial@npm:1.0.8"
-  checksum: 10c0/d8d0974996da8396457aaf41f0925058d60796303e260d6702dcc1788e4148ca4dfa472b5416f226b8c8ab459461c19f8c96f29f4c84492bd555c6aa23ee336b
+"@types/w3c-web-serial@npm:^1.0.9":
+  version: 1.0.9
+  resolution: "@types/w3c-web-serial@npm:1.0.9"
+  checksum: 10c0/ef96b42f9ffb539865cb8872bfbfb15929266c4698db0df91e63c742a15965c399d6e02f2409f9ea3be699f65eab39e70bfa5990e46dd9cca14a7f6896ee060e
   languageName: node
   linkType: hard
 
@@ -4894,7 +4914,8 @@ __metadata:
     "@types/node": "npm:26"
     "@types/postcss-flexbugs-fixes": "npm:^5.0.3"
     "@types/react": "npm:^19.2.17"
-    "@types/w3c-web-serial": "npm:^1.0.8"
+    "@types/react-color": "npm:^3.0.13"
+    "@types/w3c-web-serial": "npm:^1.0.9"
     "@types/webpack-bundle-analyzer": "npm:^4.7.0"
     autoprefixer: "npm:^10.5.2"
     bootstrap: "npm:^5.3.8"
