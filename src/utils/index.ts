@@ -16,6 +16,7 @@ export const spools = [
   { brand: 'Amazon Basics', mass: 248 },
   { brand: 'Amolen', mass: 190 },
   { brand: 'Atomic Filament', mass: 306 },
+  { brand: 'Bambu Lab', mass: 212 },
   { brand: 'Colorfabb', mass: 236 },
   { brand: 'eSun', mass: 224 },
   { brand: 'Inland', mass: 225 },
