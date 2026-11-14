@@ -15,7 +15,7 @@ import SettingsProvider from './components/SettingsProvider';
 import SuspenseFallback from './components/SuspenseFallback';
 import ErrorBoundary from './components/ErrorBoundary';
 
-const createRouteForPage = (pathOrIndex, pageName) => {
+const createRouteForPage = (pathOrIndex: string | true, pageName: string) => {
   let result: RouteObject | IndexRouteObject;
 
   if (typeof pathOrIndex === 'boolean') {
@@ -26,6 +26,8 @@ const createRouteForPage = (pathOrIndex, pageName) => {
     result = {
       path: pathOrIndex
     };
+  } else {
+    throw new Error('Invalid route supplied!');
   }
 
   result.lazy = async () => ({
