@@ -4,7 +4,7 @@ import { Form } from 'react-bootstrap';
 import { Calculator } from '../components/Calculator';
 import useCalculatorForm from '../hooks/useCalculatorForm';
 import { useSettingsContext } from '../hooks/useSettingsContext';
-import { SpoolDimensionsForm } from '../types';
+import { CalcResults, SpoolDimensionsForm } from '../types';
 import { materials, getMaterial } from '../utils';
 
 export default function SpoolDimensions() {
@@ -13,7 +13,7 @@ export default function SpoolDimensions() {
     formik: { values, handleBlur, handleChange },
     errors,
     results
-  } = useCalculatorForm<SpoolDimensionsForm>({
+  } = useCalculatorForm<SpoolDimensionsForm, CalcResults[]>({
     initialValues: {
       material: '',
       customMaterialDensity: 0,

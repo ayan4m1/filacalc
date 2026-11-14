@@ -1,10 +1,19 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, JSX, SetStateAction } from 'react';
+
+export type CalcResults = {
+  label: string;
+  content: string | JSX.Element;
+};
 
 export type ExtruderCalibrationForm = {
   currentSteps: number;
   measuredOffset: number;
   extrusionLength: number;
   extrusionPadding: number;
+};
+
+export type ExtruderCalibrationResults = {
+  stepsPerMm: number;
 };
 
 export type SpoolPrintForm = {
@@ -19,6 +28,23 @@ export type ZAxisCalibrationForm = {
   leadscrewPitch: number | 'custom';
   customLeadscrewPitch: number;
   printHeight: number;
+};
+
+export type ZAxisCalibrationResults = {
+  evenlyDivisible: boolean;
+  printHeight: number;
+  results: (
+    | {
+        label: string;
+        content: JSX.Element;
+      }
+    | CalcResults
+  )[];
+  layerHeights: {
+    height: number;
+    steps: number;
+    error: string;
+  }[];
 };
 
 export type SpoolWeightForm = {

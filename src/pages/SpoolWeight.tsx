@@ -4,7 +4,7 @@ import { Form, ProgressBar } from 'react-bootstrap';
 import { Calculator } from '../components/Calculator';
 import useCalculatorForm from '../hooks/useCalculatorForm';
 import { useSettingsContext } from '../hooks/useSettingsContext';
-import { SpoolWeightForm } from '../types';
+import { CalcResults, SpoolWeightForm } from '../types';
 import { getRemainingFilament, getSpool, materials, spools } from '../utils';
 
 export default function SpoolWeight() {
@@ -13,7 +13,7 @@ export default function SpoolWeight() {
     formik: { values, handleBlur, handleChange },
     errors,
     results
-  } = useCalculatorForm<SpoolWeightForm>({
+  } = useCalculatorForm<SpoolWeightForm, CalcResults[]>({
     initialValues: {
       brand: '',
       material: '',

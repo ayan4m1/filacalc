@@ -1,23 +1,30 @@
-import { useFormik } from 'formik';
+import { FormikTouched, FormikValues, useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 
-export default function useCalculatorForm<T>({
+type CalculatorFormOpts<V, R> = {
+  initialValues: V;
+  calculate: (values: V) => R;
+  shouldShow: (values: V, touched: FormikTouched<V>) => boolean;
+  validate: (values: V) => string[];
+};
+
+export default function useCalculatorForm<V extends FormikValues, R>({
   initialValues,
   calculate,
   shouldShow,
   validate
-}) {
-  const [results, setResults] = useState(null);
-  const [errors, setErrors] = useState([]);
+}: CalculatorFormOpts<V, R>) {
+  const [results, setResults] = useState<R>();
+  const [errors, setErrors] = useState<string[]>([]);
 
-  const formik = useFormik<T>({ initialValues, onSubmit: () => {} });
+  const formik = useFormik<V>({ initialValues, onSubmit: () => {} });
   const { values, touched } = formik;
 
   useEffect(() => {
     if (!shouldShow(values, touched)) {
       // eslint-disable-next-line
       setErrors([]);
-      setResults(null);
+      setResults(undefined);
       return;
     }
 
@@ -25,7 +32,7 @@ export default function useCalculatorForm<T>({
 
     if (validationResults.length > 0) {
       setErrors(validationResults);
-      setResults(null);
+      setResults(undefined);
     } else {
       setErrors([]);
       setResults(calculate(values));

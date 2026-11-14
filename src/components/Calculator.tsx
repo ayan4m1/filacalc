@@ -3,6 +3,8 @@ import { Card, Alert, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
+import { CalcResults } from '../types';
+
 interface CalculatorProps {
   children: ReactNode;
 }
@@ -23,10 +25,7 @@ interface CalcErrorsProps {
 
 interface CalcResultsProps {
   title?: string;
-  results?: {
-    label: string;
-    content: string;
-  }[];
+  results?: CalcResults[];
   children?: ReactNode;
 }
 

@@ -12,7 +12,7 @@ import { Calculator } from '../components/Calculator';
 import useCalculatorForm from '../hooks/useCalculatorForm';
 import { useSettingsContext } from '../hooks/useSettingsContext';
 import useParser from '../hooks/useParser';
-import { FilamentUsageForm } from '../types';
+import { CalcResults, FilamentUsageForm } from '../types';
 import { materials, getMaterial } from '../utils';
 
 export default function FilamentUsage() {
@@ -21,7 +21,7 @@ export default function FilamentUsage() {
     formik: { setFieldValue, handleBlur, handleChange, values },
     errors,
     results
-  } = useCalculatorForm<FilamentUsageForm>({
+  } = useCalculatorForm<FilamentUsageForm, CalcResults[]>({
     initialValues: {
       material: '',
       diameter: filamentDiameter,

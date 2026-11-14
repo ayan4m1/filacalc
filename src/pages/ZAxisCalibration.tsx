@@ -3,7 +3,7 @@ import { Form, Table } from 'react-bootstrap';
 
 import { Calculator } from '../components/Calculator';
 import useCalculatorForm from '../hooks/useCalculatorForm';
-import { ZAxisCalibrationForm } from '../types';
+import { ZAxisCalibrationForm, ZAxisCalibrationResults } from '../types';
 import { leadscrewPitches, stepAngles } from '../utils';
 
 export default function ZAxisCalibration() {
@@ -11,7 +11,7 @@ export default function ZAxisCalibration() {
     formik: { values, handleChange },
     errors,
     results
-  } = useCalculatorForm<ZAxisCalibrationForm>({
+  } = useCalculatorForm<ZAxisCalibrationForm, ZAxisCalibrationResults>({
     initialValues: {
       layerHeight: 0.2,
       stepAngle: 1.8,

@@ -4,14 +4,14 @@ import { Form, ListGroup, ListGroupItem } from 'react-bootstrap';
 
 import { Calculator } from '../components/Calculator';
 import useCalculatorForm from '../hooks/useCalculatorForm';
-import { ExtruderCalibrationForm } from '../types';
+import { ExtruderCalibrationForm, ExtruderCalibrationResults } from '../types';
 
 export default function ExtruderCalibration() {
   const {
     formik: { handleBlur, handleChange, values },
     errors,
     results
-  } = useCalculatorForm<ExtruderCalibrationForm>({
+  } = useCalculatorForm<ExtruderCalibrationForm, ExtruderCalibrationResults>({
     initialValues: {
       currentSteps: 100,
       measuredOffset: 0,
