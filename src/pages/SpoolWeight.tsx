@@ -4,7 +4,7 @@ import { Form, ProgressBar } from 'react-bootstrap';
 import { Calculator } from '../components/Calculator';
 import useCalculatorForm from '../hooks/useCalculatorForm';
 import { useSettingsContext } from '../hooks/useSettingsContext';
-import { CalcResults, SpoolWeightForm } from '../types';
+import { CalcResults, Spool, SpoolWeightForm } from '../types';
 import { getRemainingFilament, getSpool, materials, spools } from '../utils';
 
 export default function SpoolWeight() {
@@ -72,7 +72,7 @@ export default function SpoolWeight() {
         volume: remainingVolume,
         length: remainingLength,
         percent: remainingPercent
-      } = getRemainingFilament(vals);
+      } = getRemainingFilament(vals as unknown as Spool);
 
       let progressVariant = 'success';
 

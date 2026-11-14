@@ -402,7 +402,7 @@ export default function SpoolDatabase() {
             const { mass: remainingMass, length: remainingLength } =
               getRemainingFilament(spool);
             const purchaseDate = format(
-              parseISO(spool.purchaseDate),
+              parseISO(spool.purchaseDate ?? '1970-01-01'),
               'yyyy-MM-dd'
             );
             const material =
@@ -433,7 +433,10 @@ export default function SpoolDatabase() {
                 <td className={colRightClasses}>{spool.netWeight} g</td>
                 <td className={colRightClasses}>
                   {Boolean(spool.purchaseCost) &&
-                    ((spool.purchaseCost / spool.netWeight) * 1e3).toFixed(2)}
+                    (
+                      ((spool.purchaseCost ?? 0) / spool.netWeight) *
+                      1e3
+                    ).toFixed(2)}
                 </td>
                 <td className={colRightClasses}>
                   <div
