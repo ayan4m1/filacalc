@@ -1,5 +1,7 @@
 import { Dispatch, JSX, SetStateAction } from 'react';
 
+export type SortFields = keyof Spool | 'costPerKg';
+
 export type CalcResults = {
   label: string;
   content: string | JSX.Element;

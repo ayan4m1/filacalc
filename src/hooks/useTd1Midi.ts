@@ -1,33 +1,47 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 export default function useTd1Midi(
   onMidiMessage: (input: MIDIInput, event: MIDIMessageEvent) => void
 ) {
   const [midiDevice, setMidiDevice] = useState<MIDIInput>();
+  // hold a reference to MIDIAccess so it isn't garbage collected while connected
+  const midiAccess = useRef<MIDIAccess>(undefined);
+  const listener = useRef<(event: MIDIMessageEvent) => void>(undefined);
   const connect = useCallback(async () => {
-    const result = await navigator.requestMIDIAccess();
-    result.inputs.forEach(async (input) => {
-      if (input.name !== 'CircuitPython Audio') {
-        return;
-      }
+    // sysex messages are silently dropped unless explicitly requested
+    const access = await navigator.requestMIDIAccess({ sysex: true });
+    const input = Array.from(access.inputs.values()).find(
+      (candidate) => candidate.name === 'CircuitPython Audio'
+    );
 
-      function onMessage(this: MIDIInput, event: MIDIMessageEvent) {
-        onMidiMessage(this, event);
-      }
+    if (!input) {
+      return;
+    }
 
-      input.onmidimessage = onMessage;
-      await input.open();
+    function onMessage(event: MIDIMessageEvent) {
+      onMidiMessage(input as MIDIInput, event);
+    }
 
-      console.log('Connected to TD-1');
+    input.addEventListener('midimessage', onMessage);
+    await input.open();
 
-      setMidiDevice(input);
-    });
+    console.log('Connected to TD-1');
+
+    midiAccess.current = access;
+    listener.current = onMessage;
+    setMidiDevice(input);
   }, [onMidiMessage]);
   const disconnect = useCallback(async () => {
     if (midiDevice) {
+      if (listener.current) {
+        midiDevice.removeEventListener('midimessage', listener.current);
+      }
+
       await midiDevice.close();
     }
 
+    midiAccess.current = undefined;
+    listener.current = undefined;
     setMidiDevice(undefined);
   }, [midiDevice]);
 

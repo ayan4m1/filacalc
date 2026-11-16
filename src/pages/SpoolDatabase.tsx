@@ -43,6 +43,7 @@ import { useSettingsContext } from '../hooks/useSettingsContext';
 import { getRemainingFilament, supportsWebMidi } from '../utils';
 import SpoolEditForm from '../components/SpoolEditForm';
 import SpoolPrintForm from '../components/SpoolPrintForm';
+import { SortFields, Spool } from '../types';
 
 const SpoolSchema = Yup.object({
   vendor: Yup.string().required('Vendor must be provided.'),
@@ -87,15 +88,29 @@ export default function SpoolDatabase() {
     purchaseDate: formatISO(new Date()),
     purchaseCost: 0
   };
-  const { connect } = useTd1Midi(
-    (input: MIDIInput, message: MIDIMessageEvent) => {
-      console.dir(input);
-      console.dir(message.data);
+  const { connect, connected } = useTd1Midi(
+    (_: MIDIInput, message: MIDIMessageEvent) => {
+      const { data } = message;
+
+      if (!data) {
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      const filamentData = decoder.decode(data);
+      const [, , , , rawTd, rawColor] = filamentData.split(',');
+      const transmissionDistance = parseFloat(rawTd);
+      const color = rawColor.substring(0, 6);
+
+      return {
+        transmissionDistance,
+        color: color ? `#${color}` : '#000000'
+      };
     }
   );
   // const { serialPort, connect, readData, close, waiting } = useTd1Serial();
-  const restoreRef = useRef(null);
-  const [selectedId, setSelectedId] = useState(null);
+  const restoreRef = useRef<HTMLInputElement>(null);
+  const [selectedId, setSelectedId] = useState<string>();
   const [showEditForm, setShowEditForm] = useState(false);
   const [showPrintForm, setShowPrintForm] = useState(false);
   const { spools, findSpool, addSpool, updateSpool, removeSpool, setSpools } =
@@ -112,7 +127,7 @@ export default function SpoolDatabase() {
       ),
     [spools]
   );
-  const [sortField, setSortField] = useState('name');
+  const [sortField, setSortField] = useState<SortFields>('name');
   const [sortDirection, setSortDirection] = useState(true);
   const sortedSpools = useMemo(() => {
     const newArray = [...spools];
@@ -120,14 +135,23 @@ export default function SpoolDatabase() {
     newArray.sort((a, b) => {
       switch (sortField) {
         case 'costPerKg':
-        case 'currentWeight':
           return sortDirection
-            ? a.purchaseCost - b.purchaseCost
-            : b.purchaseCost - a.purchaseCost;
-        default:
-          return sortDirection
-            ? a[sortField]?.localeCompare(b[sortField])
-            : b[sortField]?.localeCompare(a[sortField]);
+            ? (a.purchaseCost ?? 0) - (b.purchaseCost ?? 0)
+            : (b.purchaseCost ?? 0) - (a.purchaseCost ?? 0);
+        default: {
+          const aField = a[sortField];
+          const bField = b[sortField];
+
+          if (typeof aField === 'number' && typeof bField === 'number') {
+            return sortDirection ? aField - bField : bField - aField;
+          } else if (typeof aField === 'string' && typeof bField === 'string') {
+            return sortDirection
+              ? aField.localeCompare(bField)
+              : bField.localeCompare(aField);
+          } else {
+            return 0;
+          }
+        }
       }
     });
 
@@ -157,7 +181,7 @@ export default function SpoolDatabase() {
   const handleAdd = useCallback(() => {
     handleReset(null);
     setShowEditForm(true);
-    setSelectedId(null);
+    setSelectedId(undefined);
   }, [handleReset]);
   const handleEdit = useCallback(() => {
     if (!selectedId) {
@@ -167,8 +191,10 @@ export default function SpoolDatabase() {
     const spool = findSpool(selectedId);
 
     for (const key in spool) {
+      const spoolKey = key as keyof Spool;
+
       if (Object.hasOwn(spool, key)) {
-        setFieldValue(key, spool[key]);
+        setFieldValue(key, spool[spoolKey]);
       }
     }
 
@@ -176,13 +202,29 @@ export default function SpoolDatabase() {
   }, [setShowEditForm, setFieldValue, findSpool, selectedId]);
   const handleRemove = useCallback(() => {
     if (selectedId && confirm('Are you sure you want to delete this spool?')) {
-      removeSpool(selectedId);
-      setSelectedId(null);
+      const spool = findSpool(selectedId);
+
+      if (!spool) {
+        return;
+      }
+
+      removeSpool(spool);
+      setSelectedId(undefined);
     }
-  }, [removeSpool, selectedId]);
+  }, [removeSpool, selectedId, findSpool]);
   const handleClone = useCallback(() => {
+    if (!selectedId) {
+      return;
+    }
+
+    const spool = findSpool(selectedId);
+
+    if (!spool) {
+      return;
+    }
+
     addSpool({
-      ...findSpool(selectedId),
+      ...spool,
       id: v4()
     });
   }, [addSpool, findSpool, selectedId]);
@@ -194,12 +236,17 @@ export default function SpoolDatabase() {
     setShowPrintForm(true);
   }, [selectedId, setShowPrintForm]);
   const handlePrintSubmit = useCallback(
-    (filamentWeight) => {
+    (filamentWeight: number) => {
       if (!selectedId) {
         return;
       }
 
       const spool = findSpool(selectedId);
+
+      if (!spool) {
+        return;
+      }
+
       const remainingWeight =
         Math.round((spool.currentWeight - filamentWeight) * 1e2) / 1e2;
 
@@ -218,17 +265,40 @@ export default function SpoolDatabase() {
   }, [restoreRef]);
   const handleImportSubmit = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
+      // const {
+      //   target: {
+      //     files: [file]
+      //   }
+      // } = event;
       const {
-        target: {
-          files: [file]
-        }
+        target: { files }
       } = event;
+
+      if (!files?.length) {
+        return;
+      }
+
+      const file = files.item(0);
+
+      if (!file) {
+        return;
+      }
+
       const reader = new FileReader();
 
       reader.onloadend = (loaded) => {
-        const {
-          target: { result }
-        } = loaded;
+        const { target } = loaded;
+
+        if (!target) {
+          return;
+        }
+
+        const { result } = target;
+
+        if (!result) {
+          return;
+        }
+
         const parsed = JSON.parse(result.valueOf() as string);
 
         if (
@@ -237,7 +307,7 @@ export default function SpoolDatabase() {
             'Are you sure you want to overwrite your current spool database?'
           )
         ) {
-          setSelectedId(null);
+          setSelectedId(undefined);
           setSpools(parsed);
         }
       };
@@ -260,11 +330,13 @@ export default function SpoolDatabase() {
   }, []);
   const hidePrintForm = useCallback(() => setShowPrintForm(false), []);
   const toggleSelected = useCallback(
-    (id) => setSelectedId((selId) => (selId === id ? null : id)),
+    (id: string) => setSelectedId((selId) => (selId === id ? undefined : id)),
     []
   );
-  const setSortInfo = useCallback((field, direction) => {
-    setSortField(field);
+  const setSortInfo = useCallback((field: string, direction: boolean) => {
+    const sortField = field as SortFields;
+
+    setSortField(sortField);
     setSortDirection(direction);
   }, []);
 
@@ -282,11 +354,11 @@ export default function SpoolDatabase() {
           // waiting={waiting}
         />
       )}
-      {selectedId && showPrintForm && (
+      {selectedId && findSpool(selectedId) && showPrintForm && (
         <SpoolPrintForm
           onHide={hidePrintForm}
           onSubmit={handlePrintSubmit}
-          spool={findSpool(selectedId)}
+          spool={findSpool(selectedId) as Spool}
         />
       )}
       <Row className="mb-2">
@@ -319,12 +391,7 @@ export default function SpoolDatabase() {
             <Button onClick={handleBackup}>
               <FontAwesomeIcon icon={faDownload} /> Backup
             </Button>
-            {/* {!serialPort && supportsWebSerial && (
-              <Button onClick={connect}>
-                <FontAwesomeIcon icon={faLightbulb} /> Add TD-1
-              </Button>
-            )} */}
-            {supportsWebMidi && (
+            {!connected && supportsWebMidi && (
               <Button onClick={connect}>
                 <FontAwesomeIcon icon={faLightbulb} /> Add TD-1
               </Button>
