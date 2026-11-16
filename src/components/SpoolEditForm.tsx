@@ -5,10 +5,17 @@ import { FormikErrors, FormikValues } from 'formik';
 import {
   ChangeEvent,
   ChangeEventHandler,
+  Fragment,
   SyntheticEvent,
-  useCallback
+  useCallback,
+  useState
 } from 'react';
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faInfoCircle,
+  faQuestionCircle,
+  faSpinner
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Form,
@@ -22,8 +29,8 @@ import {
   Tooltip
 } from 'react-bootstrap';
 
-import { materials } from '../utils';
-import { Spool } from '../types';
+import { materials, supportsWebMidi } from '../utils';
+import { Spool, TD1ScanResults } from '../types';
 
 interface IProps {
   isSpoolSelected: boolean;
@@ -35,22 +42,20 @@ interface IProps {
     handleSubmit: (event: SyntheticEvent<HTMLFormElement>) => void;
   };
   onHide: () => void;
-  // serialPort: SerialPort;
-  // readData: CallableFunction;
-  // close: () => void;
-  // waiting: boolean;
+  readData: () => Promise<TD1ScanResults>;
+  close: () => void;
+  waiting: boolean;
 }
 
 export default function SpoolEditForm({
   isSpoolSelected,
   form: { errors, values, handleChange, handleSubmit, setFieldValue },
-  onHide
-  // serialPort,
-  // readData,
-  // close,
-  // waiting
+  onHide,
+  readData,
+  close,
+  waiting
 }: IProps) {
-  // const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState(false);
   const handleDateChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) =>
       setFieldValue('purchaseDate', formatISO(event.target.value)),
@@ -60,18 +65,18 @@ export default function SpoolEditForm({
     (color: { hex: string }) => setFieldValue('color', color.hex),
     [setFieldValue]
   );
-  // const handleFetchClick = useCallback(async () => {
-  //   if (connected) {
-  //     close();
-  //     setConnected(false);
-  //   } else {
-  //     const { transmissionDistance, color } = await readData();
-  //     setFieldValue('transmissionDistance', transmissionDistance);
-  //     setFieldValue('color', color);
-  //   }
+  const handleFetchClick = useCallback(async () => {
+    if (connected) {
+      close();
+      setConnected(false);
+    } else {
+      const { transmissionDistance, color } = await readData();
+      setFieldValue('transmissionDistance', transmissionDistance);
+      setFieldValue('color', color);
+    }
 
-  //   setConnected((val) => !val);
-  // }, [connected]);
+    setConnected((val) => !val);
+  }, [connected, close, readData, setFieldValue]);
   const closeOnHide = useCallback(async () => {
     try {
       // await close();
@@ -267,7 +272,7 @@ export default function SpoolEditForm({
                 type="number"
                 value={values.transmissionDistance}
               />
-              {/* {serialPort?.connected && supportsWebSerial && (
+              {supportsWebMidi && (
                 <Fragment>
                   <Button onClick={handleFetchClick}>
                     <FontAwesomeIcon
@@ -293,7 +298,7 @@ export default function SpoolEditForm({
                     </Button>
                   </OverlayTrigger>
                 </Fragment>
-              )} */}
+              )}
             </InputGroup>
             <Form.Control.Feedback type="invalid">
               {errors.transmissionDistance}

@@ -88,26 +88,7 @@ export default function SpoolDatabase() {
     purchaseDate: formatISO(new Date()),
     purchaseCost: 0
   };
-  const { connect, connected } = useTd1Midi(
-    (_: MIDIInput, message: MIDIMessageEvent) => {
-      const { data } = message;
-
-      if (!data) {
-        return;
-      }
-
-      const decoder = new TextDecoder();
-      const filamentData = decoder.decode(data);
-      const [, , , , rawTd, rawColor] = filamentData.split(',');
-      const transmissionDistance = parseFloat(rawTd);
-      const color = rawColor.substring(0, 6);
-
-      return {
-        transmissionDistance,
-        color: color ? `#${color}` : '#000000'
-      };
-    }
-  );
+  const { connect, connected, readData, waiting } = useTd1Midi();
   // const { serialPort, connect, readData, close, waiting } = useTd1Serial();
   const restoreRef = useRef<HTMLInputElement>(null);
   const [selectedId, setSelectedId] = useState<string>();
@@ -345,13 +326,12 @@ export default function SpoolDatabase() {
       <title>{`Filacalc - Spool Database`}</title>
       {showEditForm && (
         <SpoolEditForm
-          // close={close}
+          close={close}
           form={form}
           isSpoolSelected={Boolean(selectedId)}
           onHide={hideForm}
-          // readData={readData}
-          // serialPort={serialPort}
-          // waiting={waiting}
+          readData={readData}
+          waiting={waiting}
         />
       )}
       {selectedId && findSpool(selectedId) && showPrintForm && (

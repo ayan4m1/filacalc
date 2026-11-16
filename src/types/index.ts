@@ -94,6 +94,11 @@ export type Spool = {
   vendor?: string;
 };
 
+export type TD1ScanResults = {
+  transmissionDistance: number;
+  color: string;
+};
+
 export type SettingsContext = {
   filamentDiameter: number;
   setFilamentDiameter: Dispatch<SetStateAction<number>>;
