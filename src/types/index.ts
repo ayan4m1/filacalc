@@ -78,6 +78,20 @@ export type FilamentUsageForm = {
   customMaterialDensity: number;
 };
 
+export type VolumetricFlowForm = {
+  nozzle?: string;
+  hotend?: string;
+  nozzleDiameter: number;
+  filamentDiameter: number;
+  customNozzleDiameter: number;
+  customNozzleLength: number;
+  customMeltZoneDiameter: number;
+  customMeltZoneLength: number;
+  layerHeight: number;
+  extrusionWidth: number;
+  printSpeed: number;
+};
+
 export type Spool = {
   color: string;
   currentWeight: number;

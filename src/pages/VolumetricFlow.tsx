@@ -4,62 +4,62 @@ import { Button, Form, Dropdown } from 'react-bootstrap';
 
 import { useSettingsContext } from '../hooks/useSettingsContext';
 import { getHotend, getNozzle, hotends, nozzles } from '../utils';
+import { VolumetricFlowForm } from '../types';
 
 export default function VolumetricFlow() {
   const { filamentDiameter } = useSettingsContext();
 
-  const { values, handleChange, handleSubmit, setFieldValue } = useFormik({
-    initialValues: {
-      nozzle: null,
-      hotend: null,
-      nozzleDiameter: 0.4,
-      filamentDiameter,
-      customNozzleDiameter: 0,
-      customNozzleLength: 0,
-      customMeltZoneDiameter: 0,
-      customMeltZoneLength: 0,
-      layerHeight: 0.2,
-      extrusionWidth: 0.3,
-      printSpeed: 50
-    },
-    onSubmit: (vals) => {
-      const nozzle =
-        vals.nozzle !== 'custom'
-          ? getNozzle(vals.nozzle)
-          : {
-              diameter: vals.customNozzleDiameter,
-              length: vals.customNozzleLength
-            };
-      const hotend =
-        vals.hotend !== 'custom'
-          ? getHotend(vals.hotend)
-          : {
-              meltZoneDiameter: vals.customMeltZoneDiameter,
-              meltZoneLength: vals.customMeltZoneLength
-            };
+  const { values, handleChange, handleSubmit, setFieldValue } =
+    useFormik<VolumetricFlowForm>({
+      initialValues: {
+        nozzleDiameter: 0.4,
+        filamentDiameter,
+        customNozzleDiameter: 0,
+        customNozzleLength: 0,
+        customMeltZoneDiameter: 0,
+        customMeltZoneLength: 0,
+        layerHeight: 0.2,
+        extrusionWidth: 0.3,
+        printSpeed: 50
+      },
+      onSubmit: (vals) => {
+        const nozzle =
+          vals.nozzle !== 'custom'
+            ? getNozzle(vals.nozzle as string)
+            : {
+                diameter: vals.customNozzleDiameter,
+                length: vals.customNozzleLength
+              };
+        const hotend =
+          vals.hotend !== 'custom'
+            ? getHotend(vals.hotend as string)
+            : {
+                meltZoneDiameter: vals.customMeltZoneDiameter,
+                meltZoneLength: vals.customMeltZoneLength
+              };
 
-      if (!hotend || !nozzle) {
-        return;
+        if (!hotend || !nozzle) {
+          return;
+        }
+
+        const newNozzleVolume =
+          Math.PI * Math.pow(nozzle.diameter / 2.0, 2) * nozzle.length;
+        const newMeltZoneVolume =
+          Math.PI *
+          Math.pow(hotend.meltZoneDiameter / 2.0, 2) *
+          hotend.meltZoneLength;
+        const totalMeltVolume = newNozzleVolume + newMeltZoneVolume;
+        const desiredFlowRate =
+          vals.extrusionWidth * vals.layerHeight * vals.printSpeed;
+
+        console.dir(
+          `${newNozzleVolume.toFixed(2)} mm^3 + ${newMeltZoneVolume.toFixed(
+            2
+          )} mm^3 = ${totalMeltVolume.toFixed(2)} mm^3`
+        );
+        console.dir(`${desiredFlowRate} mm^3/s`);
       }
-
-      const newNozzleVolume =
-        Math.PI * Math.pow(nozzle.diameter / 2.0, 2) * nozzle.length;
-      const newMeltZoneVolume =
-        Math.PI *
-        Math.pow(hotend.meltZoneDiameter / 2.0, 2) *
-        hotend.meltZoneLength;
-      const totalMeltVolume = newNozzleVolume + newMeltZoneVolume;
-      const desiredFlowRate =
-        vals.extrusionWidth * vals.layerHeight * vals.printSpeed;
-
-      console.dir(
-        `${newNozzleVolume.toFixed(2)} mm^3 + ${newMeltZoneVolume.toFixed(
-          2
-        )} mm^3 = ${totalMeltVolume.toFixed(2)} mm^3`
-      );
-      console.dir(`${desiredFlowRate} mm^3/s`);
-    }
-  });
+    });
 
   const changeNozzle = useCallback(
     (name: string | null) => {
