@@ -404,7 +404,7 @@ export default function SpoolDatabase() {
           </Button>
         </ButtonGroup>
       </div>
-      <Table>
+      <Table className="text-white">
         <thead>
           <tr>
             <th colSpan={5}></th>
