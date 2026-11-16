@@ -1,6 +1,6 @@
 import { Spool } from '../types';
 
-export const createWebWorker = (worker) => {
+export const createWebWorker = (worker: () => void) => {
   if (typeof window !== 'object') {
     return;
   }
