@@ -1,8 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-import parserWorker from '../workers/parser';
-import { createWebWorker } from '../utils';
-
 type ProgressEvent = {
   type: 'progress';
   progress: number;
@@ -21,7 +18,10 @@ type ErrorEvent = {
 type ParserEvent = ProgressEvent | ResultEvent | ErrorEvent;
 
 export default function useParser(handler: (result: ResultEvent) => void) {
-  const ParserWorker = useMemo(() => createWebWorker(parserWorker), []);
+  const ParserWorker = useMemo(
+    () => new Worker(new URL('../workers/parser.ts', import.meta.url)),
+    []
+  );
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -52,7 +52,10 @@ export default function useParser(handler: (result: ResultEvent) => void) {
     (event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
 
-      if (!file || !file.name.endsWith('.gcode')) {
+      if (
+        !file ||
+        (!file.name.endsWith('.gcode') && !file.name.endsWith('.gcode.3mf'))
+      ) {
         setError(true);
         setLoading(false);
         return;
@@ -62,7 +65,10 @@ export default function useParser(handler: (result: ResultEvent) => void) {
       setLoading(true);
       setProgress(0);
 
-      ParserWorker?.postMessage(file);
+      ParserWorker?.postMessage({
+        format: file.name.endsWith('.3mf') ? '3mf' : 'gcode',
+        file
+      });
     },
     [ParserWorker]
   );

@@ -4967,6 +4967,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.62.1"
+    unzipit: "npm:^2.1.1"
     use-local-storage-state: "npm:^19.5.0"
     uuid: "npm:^14.0.1"
     webpack: "npm:^5.108.4"
@@ -10209,6 +10210,13 @@ __metadata:
     "@unrs/resolver-binding-win32-x64-msvc":
       optional: true
   checksum: 10c0/c91b112c71a33d6b24e5c708dab43ab80911f2df8ee65b87cd7a18fb5af446708e98c4b415ca262026ad8df326debcc7ca6a801b2935504d87fd6f0b9d70dce1
+  languageName: node
+  linkType: hard
+
+"unzipit@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "unzipit@npm:2.1.1"
+  checksum: 10c0/fb1ef8e5f014abef605838214818332f472895779cfc1334bf3575afe1199b6be78ce99f03c3fdc7d1acb3dd5ea80816975be3b323deee10772b286e105361b7
   languageName: node
   linkType: hard
 

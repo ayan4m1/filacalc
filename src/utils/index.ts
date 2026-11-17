@@ -1,16 +1,5 @@
 import { Spool } from '../types';
 
-export const createWebWorker = (worker: () => void) => {
-  if (typeof window !== 'object') {
-    return;
-  }
-
-  const code = worker.toString();
-  const blob = new Blob([`(${code})()`]);
-
-  return new Worker(URL.createObjectURL(blob));
-};
-
 export const spools = [
   { brand: '3D Solutech', mass: 173 },
   { brand: 'Amazon Basics', mass: 248 },

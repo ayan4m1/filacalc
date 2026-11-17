@@ -113,6 +113,8 @@ export type TD1ScanResults = {
   color: string;
 };
 
+export type GCodeParserMessage = { format: '3mf' | 'gcode'; file: File };
+
 export type SettingsContext = {
   filamentDiameter: number;
   setFilamentDiameter: Dispatch<SetStateAction<number>>;

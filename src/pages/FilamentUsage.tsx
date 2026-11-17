@@ -59,10 +59,10 @@ export default function FilamentUsage() {
         (Math.PI * Math.pow(vals.diameter / 2.0, 2) * (vals.length * 1e3)) /
         1e3;
       const density =
-        vals.material !== 'custom'
+        (vals.material !== 'custom'
           ? getMaterial(vals.material)?.density
-          : vals.customMaterialDensity;
-      const mass = volume * (density ?? 1);
+          : vals.customMaterialDensity) ?? 1;
+      const mass = volume * density;
 
       let cost = 0;
 
@@ -88,11 +88,8 @@ export default function FilamentUsage() {
       ];
     }, [])
   });
-  const parser = useParser(
-    useCallback(
-      (data) => setFieldValue('length', data.length.toFixed(2)),
-      [setFieldValue]
-    )
+  const parser = useParser((data) =>
+    setFieldValue('length', data.length.toFixed(2))
   );
 
   if (parser.loading) {
